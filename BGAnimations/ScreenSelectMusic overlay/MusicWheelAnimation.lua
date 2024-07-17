@@ -16,27 +16,41 @@ local NumWheelItems = 15
 -- The upper Quad has cropbottom applied while the lower Quad has croptop applied
 -- resulting in a visual effect where the MusicWheelItems appear to "grow" out of the center to full-height.
 
+local baseSleepTime = 0.05
+local animationDuration = 0.1
+local initialAlpha = 0.25
+
 for i=1,NumWheelItems-2 do
+	local sleepTime = baseSleepTime * i
+	local yPosUpper = 9 + (_screen.h/NumWheelItems)*i
+	local yPosLower = 25 + (_screen.h/NumWheelItems)*i
+	local quadWidth = _screen.w/2
+	local quadHeight = (_screen.h/NumWheelItems)/2
+
 	-- upper
 	t[#t+1] = Def.Quad{
 		InitCommand=function(self)
 			self:x( _screen.cx+_screen.w/4 )
-				:y( 9 + (_screen.h/NumWheelItems)*i )
-				:zoomto(_screen.w/2, (_screen.h/NumWheelItems)/2)
+				:y( yPosUpper )
+				:zoomto(quadWidth, quadHeight)
 				:diffuse( Color.Black )
 		end,
-		OnCommand=function(self) self:sleep(i*0.05):linear(0.1):cropbottom(1):diffusealpha(0.25):queuecommand("Hide") end,
+		OnCommand=function(self)
+			self:sleep(sleepTime):linear(animationDuration):cropbottom(1):diffusealpha(initialAlpha):queuecommand("Hide")
+		end,
 		HideCommand=function(self) self:visible(false) end
 	}
 	-- lower
 	t[#t+1] = Def.Quad{
 		InitCommand=function(self)
 			self:x( _screen.cx+_screen.w/4 )
-				:y( 25 + (_screen.h/NumWheelItems)*i )
-				:zoomto(_screen.w/2, (_screen.h/NumWheelItems)/2)
+				:y( yPosLower )
+				:zoomto(quadWidth, quadHeight)
 				:diffuse( Color.Black )
 		end,
-		OnCommand=function(self) self:sleep(i*0.05):linear(0.1):croptop(1):diffusealpha(0.25):queuecommand("Hide") end,
+		OnCommand=function(self)
+			self:sleep(sleepTime):linear(animationDuration):croptop(1):diffusealpha(initialAlpha):queuecommand("Hide")
+		end,
 		HideCommand=function(self) self:visible(false) end
 	}
 end
