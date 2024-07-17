@@ -31,46 +31,32 @@ end
 -- returns formatted strings for player tag (from ScreenNameEntry) and PercentScore
 
 local GetNameAndScore = function(SongOrCourse, StepsOrTrail, pn, itg)
-	-- nil pn means machine score
-	-- if we don't have everything we need, return empty strings
-	if not (SongOrCourse and StepsOrTrail) then return "","" end
-	if (pn) and (not WF.PlayerProfileStats[pn]) then return "","" end
+    if not (SongOrCourse and StepsOrTrail) then return "","" end
+    if pn and not WF.PlayerProfileStats[pn] then return "","" end
 
-	local score, name, ct, fa10, fa15
-	local rate = RateFromNumber(SL.Global.ActiveModifiers.MusicRate)
-	local iscourse = (SongOrCourse.GetAllSteps == nil)
-	local hash = (not iscourse) and HashCacheEntry(StepsOrTrail)
-	local stats = WF.FindProfileSongStatsFromSteps(SongOrCourse, StepsOrTrail,
-		rate, hash, pn)
+    local score, name = "0.00", "----"
+    local ct, fa10, fa15
+    local rate = RateFromNumber(SL.Global.ActiveModifiers.MusicRate)
+    local iscourse = not SongOrCourse.GetAllSteps
+    local hash = iscourse and "" or HashCacheEntry(StepsOrTrail)
+    local stats = WF.FindProfileSongStatsFromSteps(SongOrCourse, StepsOrTrail, rate, hash, pn)
 
-	if stats then
-		if pn then
-			score = string.format("%0.2f", ((not itg) and stats.BestPercentDP or stats.BestPercentDP_ITG)/100)
-			name = "PB"
-			fa10 = stats.BestFAPlusCounts[1]
-			fa15 = stats.BestFAPlusCounts[3]
-			if not itg then
-				ct = stats.BestClearType
-			else
-				if stats.Cleared_ITG then ct = (stats.Cleared_ITG == "C") and WF.ClearTypes.Clear or WF.ClearTypes.Fail
-				else ct = WF.ClearTypes.None end
-			end
-		else
-			local item = stats["HighScoreList"..(itg and "_ITG" or "")][1]
-			if item then
-				score = string.format("%0.2f", item.PercentDP/100)
-				name = item.PlayerHSName
-			else
-				score = "0.00"
-				name = "----"
-			end
-		end
-	else
-		score = "0.00"
-		name = "----"
-	end
+    if stats then
+        local bestScore = pn and ((not itg) and stats.BestPercentDP or stats.BestPercentDP_ITG) or stats["HighScoreList"..(itg and "_ITG" or "")][1] and stats["HighScoreList"..(itg and "_ITG" or "")][1].PercentDP
+        score = string.format("%0.2f", (bestScore or 0)/100)
+        name = pn and "PB" or stats["HighScoreList"..(itg and "_ITG" or "")][1] and stats["HighScoreList"..(itg and "_ITG" or "")][1].PlayerHSName or "----"
+        if pn then
+            fa10 = stats.BestFAPlusCounts[1]
+            fa15 = stats.BestFAPlusCounts[3]
+            if not itg then
+                ct = stats.BestClearType
+            else
+                ct = stats.Cleared_ITG and ((stats.Cleared_ITG == "C") and WF.ClearTypes.Clear or WF.ClearTypes.Fail) or WF.ClearTypes.None
+            end
+        end
+    end
 
-	return score, name, ct, fa10, fa15
+    return score, name, ct, fa10, fa15
 end
 
 -- -----------------------------------------------------------------------
@@ -124,128 +110,67 @@ local GetGSName = function(gsEntry)
 end
 
 local GetScoresRequestProcessor = function(res, master)
-	if master == nil then return end
-	-- If we're not hovering over a song when we get the request, then we don't
-	-- have to update anything. We don't have to worry about courses here since
-	-- we don't run the RequestResponseActor in CourseMode.
-	local song = GAMESTATE:GetCurrentSong()
-	if song == nil then return end
-	if chartchanged then return end
+    if not master or not GAMESTATE:GetCurrentSong() or chartchanged then return end
 
-	for i=1,2 do
-		local steps = GAMESTATE:GetCurrentSteps("PlayerNumber_P"..i)
+    local function processEntry(gsEntry, paneDisplay, scoreType)
+        local scoreActor = paneDisplay:GetChild(scoreType.."HighScore")
+        local nameActor = paneDisplay:GetChild(scoreType.."HighScoreName")
+        local score = string.format("%0.2f", gsEntry["score"]/100)
+        local name = scoreType == "Machine" and GetMachineTag(gsEntry) or "PB"
+        SetNameAndScore(name, score, nameActor, scoreActor)
+    end
 
-		local paneDisplay = master:GetChild("PaneDisplayP"..i)
+    for i = 1, 2 do
+        local playerStr = "player"..i
+        local steps = GAMESTATE:GetCurrentSteps("PlayerNumber_P"..i)
+        local paneDisplay = master:GetChild("PaneDisplayP"..i)
+        local cttext = paneDisplay:GetChild("CTText")
+        local data = res and res["status"] == "success" and res["data"] or nil
+        local worldRecordSet, personalRecordSet = false, false
 
-		local machineScore = paneDisplay:GetChild("MachineHighScore")
-		local machineName = paneDisplay:GetChild("MachineHighScoreName")
+        if data and data[playerStr] and data[playerStr]["gsLeaderboard"] and HashCacheEntry(steps) == data[playerStr]["chartHash"]
+            and SL["P"..i].ActiveModifiers.SimulateITGEnv
+            and ((SL.Global.ActiveModifiers.MusicRate == 1.0) or SL["P"..i].ActiveModifiers.GSOverride) then
 
-		local playerScore = paneDisplay:GetChild("PlayerHighScore")
-		local playerName = paneDisplay:GetChild("PlayerHighScoreName")
-		local cttext = paneDisplay:GetChild("CTText")
+            for _, gsEntry in ipairs(data[playerStr]["gsLeaderboard"]) do
+                if gsEntry["rank"] == 1 then
+                    processEntry(gsEntry, paneDisplay, "Machine")
+                    worldRecordSet = true
+                end
 
-		local playerStr = "player"..i
-		local rivalNum = 1
-		local worldRecordSet = false
-		local personalRecordSet = false
-		local data = ((res ~= nil) and res["status"] == "success") and res["data"] or nil
+                if gsEntry["isSelf"] then
+                    WF.PullITGScoreFromGrooveStats(i, data[playerStr]["chartHash"], gsEntry)
+                    local rate = RateFromNumber(SL.Global.ActiveModifiers.MusicRate)
+                    local stats = WF.FindProfileSongStatsFromSteps(GAMESTATE:GetCurrentSong(), steps, rate, HashCacheEntry(steps), i)
+                    local usegspr = not stats or stats.BestPercentDP_ITG <= gsEntry["score"]
+                    local ct = usegspr and (gsEntry["isFail"] and WF.ClearTypes.Fail or WF.ClearTypes.Clear) or (stats.Cleared_ITG == "F" and WF.ClearTypes.Fail or WF.ClearTypes.Clear)
+                    SetClearType(ct, cttext)
+                    processEntry(gsEntry, paneDisplay, "Player")
+                    personalRecordSet = true
+                end
 
-		-- First check to see if the leaderboard even exists.
-		if data and data[playerStr] and data[playerStr]["gsLeaderboard"] then
-			-- And then also ensure that the chart hash matches the currently parsed one.
-			-- It's better to just not display anything than display the wrong scores.
-			-- also don't bother doing this stuff if player isn't on itg mode.
-			-- finally, we don't want to set these if on a rate mod and the preference to override is off.
-			if (HashCacheEntry(steps) == data[playerStr]["chartHash"])
-			and SL["P"..i].ActiveModifiers.SimulateITGEnv
-			and ((SL.Global.ActiveModifiers.MusicRate == 1.0) or SL["P"..i].ActiveModifiers.GSOverride) then
-				for gsEntry in ivalues(data[playerStr]["gsLeaderboard"]) do
-					if gsEntry["rank"] == 1 then
-						SetNameAndScore(
-							GetMachineTag(gsEntry),
-							string.format("%0.2f", gsEntry["score"]/100),
-							machineName,
-							machineScore
-						)
-						worldRecordSet = true
-						end
+                if gsEntry["isRival"] then
+                    local rivalNum = 1
+                    local rivalScore = paneDisplay:GetChild("Rival"..rivalNum.."Score")
+                    local rivalName = paneDisplay:GetChild("Rival"..rivalNum.."Name")
+                    SetNameAndScore(GetMachineTag(gsEntry), string.format("%0.2f", gsEntry["score"]/100), rivalName, rivalScore)
+                    rivalNum = rivalNum + 1
+                end
+            end
+        end
 
-					if gsEntry["isSelf"] then
-						-- we can update the local player score if the gs score is higher :)
-						-- see WF-Profiles.lua for all the logic considered here
-						WF.PullITGScoreFromGrooveStats(i, data[playerStr]["chartHash"], gsEntry)
+        if not worldRecordSet then paneDisplay:GetChild("MachineHighScoreName"):queuecommand("SetDefault") end
+        if not personalRecordSet then paneDisplay:GetChild("PlayerHighScoreName"):queuecommand("SetDefault") end
 
-						-- compare score to local first
-						local rate = RateFromNumber(SL.Global.ActiveModifiers.MusicRate)
-						local stats = WF.FindProfileSongStatsFromSteps(song, steps,
-							rate, HashCacheEntry(steps), i)
-
-						local usegspr = true
-						if (stats) and (stats.BestPercentDP_ITG > gsEntry["score"]) then
-							usegspr = false
-						end
-
-						local ct = WF.ClearTypes.None
-						if usegspr then
-							SetNameAndScore(
-								"PB",
-								string.format("%0.2f", gsEntry["score"]/100),
-								playerName,
-								playerScore
-							)
-							ct = (gsEntry["isFail"]) and WF.ClearTypes.Fail or WF.ClearTypes.Clear
-						else
-							SetNameAndScore(
-								"LOCAL",
-								string.format("%0.2f", stats.BestPercentDP_ITG/100),
-								playerName,
-								playerScore
-							)
-							ct = (stats.Cleared_ITG == "F") and WF.ClearTypes.Fail or WF.ClearTypes.Clear
-						end
-						SetClearType(ct, cttext)
-						personalRecordSet = true
-					end
-
-					if gsEntry["isRival"] then
-						local rivalScore = paneDisplay:GetChild("Rival"..rivalNum.."Score")
-						local rivalName = paneDisplay:GetChild("Rival"..rivalNum.."Name")
-						SetNameAndScore(
-							GetMachineTag(gsEntry),
-							string.format("%0.2f", gsEntry["score"]/100),
-							rivalName,
-							rivalScore
-						)
-						rivalNum = rivalNum + 1
-					end
-				end
-			end
-		end
-
-		-- Fall back to to using the machine profile's record if we never set the world record.
-		-- This chart may not have been ranked, or there is no WR, or the request failed.
-		if not worldRecordSet then
-			machineName:queuecommand("SetDefault")
-		end
-
-		-- Fall back to to using the personal profile's record if we never set the record.
-		-- This chart may not have been ranked, or we don't have a score for it, or the request failed.
-		if not personalRecordSet then
-			playerName:queuecommand("SetDefault")
-		end
-
-		-- Iterate over any remaining rivals and hide them.
-		-- This also handles the failure case as rivalNum will never have been incremented.
-		-- Only do tihs if expected to use gs in the first place
-		if UseGSScore("P"..i) then
-			for j=rivalNum,3 do
-				local rivalScore = paneDisplay:GetChild("Rival"..j.."Score")
-				local rivalName = paneDisplay:GetChild("Rival"..j.."Name")
-				rivalScore:settext("----")
-				rivalName:settext("----")
-			end
-		end
-	end
+        if UseGSScore("P"..i) then
+            for j = (personalRecordSet and 2 or 1), 3 do
+                local rivalScore = paneDisplay:GetChild("Rival"..j.."Score")
+                local rivalName = paneDisplay:GetChild("Rival"..j.."Name")
+                rivalScore:settext("----")
+                rivalName:settext("----")
+            end
+        end
+    end
 end
 
 -- -----------------------------------------------------------------------
@@ -294,72 +219,59 @@ af.SetCommand = function(self)
 end
 
 af[#af+1] = RequestResponseActor("GetScores", 10)..{
-	OnCommand=function(self)
-		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-			-- If a profile is joined for this player, try and fetch the API key.
-			-- A non-valid API key will have the field set to the empty string.
-			if PROFILEMAN:GetProfile(player) then
-				ParseGrooveStatsIni(player)
-			end
-		end
-	end,
-	PlayerJoinedMessageCommand=function(self, params)
-		if GAMESTATE:IsHumanPlayer(params.Player) and PROFILEMAN:GetProfile(params.Player) then
-			ParseGrooveStatsIni(params.Player)
-		end
-	end,
-	CheckScoresCommand=function(self)
-		chartchanged = false
-		if not (GAMESTATE:GetCurrentSong() or GAMESTATE:GetCurrentCourse()) then return end
-		
-		-- signal everything to set default for any of these exit conditions
-		local defaultall = false
-		if GAMESTATE:IsCourseMode() then defaultall = true end
-		if not IsServiceAllowed(SL.GrooveStats.GetScores) then defaultall = true end
-		if not (SL.P1.ActiveModifiers.SimulateITGEnv or SL.P2.ActiveModifiers.SimulateITGEnv) then
-			defaultall = true
-		end
-		if not (SL.Global.ActiveModifiers.MusicRate == 1.0 or (SL.P1.ActiveModifiers.GSOverride or 
-			SL.P2.ActiveModifiers.GSOverride)) then defaultall = true end
+    OnCommand=function(self)
+        for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+            -- If a profile is joined for this player, try and fetch the API key.
+            -- A non-valid API key will have the field set to the empty string.
+            if PROFILEMAN:GetProfile(player) then
+                ParseGrooveStatsIni(player)
+            end
+        end
+    end,
+    PlayerJoinedMessageCommand=function(self, params)
+        if GAMESTATE:IsHumanPlayer(params.Player) and PROFILEMAN:GetProfile(params.Player) then
+            ParseGrooveStatsIni(params.Player)
+        end
+    end,
+    CheckScoresCommand=function(self)
+        chartchanged = false
+        if not (GAMESTATE:GetCurrentSong() or GAMESTATE:GetCurrentCourse()) then return end
+        
+        -- signal everything to set default for any of these exit conditions
+        local defaultall = GAMESTATE:IsCourseMode() or not IsServiceAllowed(SL.GrooveStats.GetScores) or 
+            not (SL.P1.ActiveModifiers.SimulateITGEnv or SL.P2.ActiveModifiers.SimulateITGEnv) or 
+            not (SL.Global.ActiveModifiers.MusicRate == 1.0 or SL.P1.ActiveModifiers.GSOverride or SL.P2.ActiveModifiers.GSOverride)
 
-		if defaultall then
-			self:GetParent():playcommand("SetDefault")
-			return
-		end
+        if defaultall then
+            self:GetParent():playcommand("SetDefault")
+            return
+        end
 
-		-- Get hash for current steps from the Hash Cache #HashCash.
-		local sendRequest = false
-		local data = {
-			action="groovestats/player-scores",
-		}
+        local sendRequest = false
+        local data = { action="groovestats/player-scores" }
 
-		for i=1,2 do
-			local pn = "P"..i
-			local steps = GAMESTATE:GetCurrentSteps("PlayerNumber_P"..i)
-			local hash = steps and HashCacheEntry(GAMESTATE:GetCurrentSteps("PlayerNumber_P"..i))
-			local pane = SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("PaneDisplayMaster")
-				:GetChild("PaneDisplayP"..i)
-			if (SL[pn].ApiKey ~= "") and hash then
-				data["player"..i] = {
-					chartHash=hash,
-					apiKey=SL[pn].ApiKey
-				}
-				if UseGSScore(pn) then pane:playcommand("SetLoading") end
-				sendRequest = true
-			end
-			if not UseGSScore(pn) then pane:playcommand("SetDefault") end
-		end
+        for i=1,2 do
+            local pn = "P"..i
+            local steps = GAMESTATE:GetCurrentSteps("PlayerNumber_P"..i)
+            local hash = steps and HashCacheEntry(steps)
+            local pane = SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("PaneDisplayMaster"):GetChild("PaneDisplayP"..i)
+            if (SL[pn].ApiKey ~= "") and hash then
+                data["player"..i] = { chartHash=hash, apiKey=SL[pn].ApiKey }
+                if UseGSScore(pn) then pane:playcommand("SetLoading") end
+                sendRequest = true
+            else
+                pane:playcommand("SetDefault")
+            end
+        end
 
-		-- Only send the request if it's applicable.
-		if sendRequest then
-			MESSAGEMAN:Broadcast("GetScores", {
-				data=data,
-				args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("PaneDisplayMaster"),
-				callback=GetScoresRequestProcessor
-			})
-		end
-	end,
-
+        if sendRequest then
+            MESSAGEMAN:Broadcast("GetScores", {
+                data=data,
+                args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("PaneDisplayMaster"),
+                callback=GetScoresRequestProcessor
+            })
+        end
+    end,
 }
 
 for player in ivalues(PlayerNumber) do
@@ -419,31 +331,29 @@ for player in ivalues(PlayerNumber) do
 	-- add one BitmapText as the label and one BitmapText as the value for each PaneItem
 
 	for i, item in ipairs(PaneItems) do
-
-		local col = ((i-1)%num_cols) + 1
-		local row = math.floor((i-1)/num_cols) + 1
+		local col = ((i-1) % num_cols) + 1
+		local row = math.floor((i-1) / num_cols) + 1
+		local xPos = pos.col[col]
+		local yPos = pos.row[row]
 
 		af2[#af2+1] = Def.ActorFrame{
-
 			Name=item.name,
 
 			-- numerical value
 			LoadFont("Common Normal")..{
 				InitCommand=function(self)
 					self:zoom(text_zoom):diffuse(Color.Black):horizalign(right)
-					self:x(pos.col[col])
-					self:y(pos.row[row])
+					self:xy(xPos, yPos)
 				end,
 
 				SetCommand=function(self)
 					local SongOrCourse, StepsOrTrail = GetSongAndSteps(player)
 					if not SongOrCourse then self:settext("?"); return end
-					if not StepsOrTrail then self:settext("");  return end
+					if not StepsOrTrail then self:settext(""); return end
 
 					if item.rc then
-						local val = StepsOrTrail:GetRadarValues(player):GetValue( item.rc )
-						-- the engine will return -1 as the value for autogenerated content; show a question mark instead if so
-						self:settext( val >= 0 and val or "?" )
+						local val = StepsOrTrail:GetRadarValues(player):GetValue(item.rc)
+						self:settext(val >= 0 and val or "?")
 					end
 				end
 			},
@@ -453,8 +363,7 @@ for player in ivalues(PlayerNumber) do
 				Text=item.name,
 				InitCommand=function(self)
 					self:zoom(text_zoom):diffuse(Color.Black):horizalign(left)
-					self:x(pos.col[col]+3)
-					self:y(pos.row[row])
+					self:xy(xPos + 3, yPos)
 				end
 			},
 		}
@@ -579,29 +488,26 @@ for player in ivalues(PlayerNumber) do
 	-- Add actors for Rival score data. Hidden by default
 	-- We position relative to column 3 for spacing reasons.
 	for i=1,3 do
+		local xPosName = pos.col[3]+WideScale(50, 54)*text_zoom
+		local xPosScore = pos.col[3]+WideScale(122, 125)*text_zoom
+		local yPos = pos.row[i]
+
 		-- Rival Machine Tag
 		af2[#af2+1] = LoadFont("Common Normal")..{
 			Name="Rival"..i.."Name",
 			InitCommand=function(self)
 				self:zoom(text_zoom):diffuse(Color.Black):maxwidth(30)
-				self:x(pos.col[3]+WideScale(50, 54)*text_zoom)
-				self:y(pos.row[i])
+				self:xy(xPosName, yPos)
 			end,
 			OnCommand=function(self)
-				--if not ((IsServiceAllowed(SL.GrooveStats.GetScores) and UseGSScore(pn))
-				--or ((not itg) and WF.PlayerProfileStats[pnum])) then
-				if not WF.PlayerProfileStats[pnum] then
-					self:visible(false)
-				end
+				self:visible(WF.PlayerProfileStats[pnum] ~= nil)
 			end,
 			SetCommand=function(self)
-				-- hijack this to show fa+ if not itg
 				if UseGSScore(pn) then
 					self:settext("----")
 				else
-					if i == 1 then self:settext("FA+")
-					elseif i == 2 then self:settext("10ms")
-					elseif i == 3 then self:settext("15ms") end
+					local faText = (i == 1 and "FA+") or (i == 2 and "10ms") or (i == 3 and "15ms")
+					self:settext(faText)
 				end
 			end,
 			SetLoadingCommand = function(self) self:settext(". . .") end
@@ -612,16 +518,10 @@ for player in ivalues(PlayerNumber) do
 			Name="Rival"..i.."Score",
 			InitCommand=function(self)
 				self:zoom(text_zoom):diffuse(Color.Black):horizalign(right)
-				self:x(pos.col[3]+WideScale(122, 125)*text_zoom)
-				self:y(pos.row[i])
+				self:xy(xPosScore, yPos)
 			end,
 			OnCommand=function(self)
-				--if not ((IsServiceAllowed(SL.GrooveStats.GetScores) and UseGSScore(pn))
-				--or ((not itg) and WF.PlayerProfileStats[pnum])) then
-				if not WF.PlayerProfileStats[pnum] then
-					self:visible(false)
-				end
-				if (not UseGSScore(pn)) and i == 1 then self:visible(false) end
+				self:visible(WF.PlayerProfileStats[pnum] ~= nil and (UseGSScore(pn) or i ~= 1))
 			end,
 			SetCommand=function(self)
 				self:settext("----")
@@ -629,6 +529,7 @@ for player in ivalues(PlayerNumber) do
 			SetLoadingCommand = function(self) self:settext(". . .") end
 		}
 	end
+
 end
 
 return af
