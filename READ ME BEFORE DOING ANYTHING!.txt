@@ -1,0 +1,22 @@
+Evaluation music has been changed and requires different naming convention now
+
+I changed the way the Evaluation screen music works. I haven't included a music file, but if you add one in, you will need to change the filename.
+
+If you want separate sounds for pass/fail, put the files into your Sounds directory under the names:
+
+ScreenEvaluation passed.ogg
+ScreenEvaluation failed.ogg
+
+If you just want a single file for both pass and fail, name it 
+
+ScreenEvaluation both.ogg
+
+If you want it to loop, add (loop) into the filename e.g. ScreenEvaluation passed (loop).ogg. If none of these files exist, it will just play nothing.
+
+
+--------
+
+
+Thank you SteveReen for making Waterfall. This version was originally intended to just be the base with a few QoL and fun changes. The changes added up fast so I thought I might as well release something if people want to use it.
+
+Original theme here: https://twitter.com/SteveReen/status/1392057636518973442?s=20&t=0F7VmROnJRayeLtXcSQOHw

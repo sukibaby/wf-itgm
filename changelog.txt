@@ -1,0 +1,208 @@
+2022-07-07 - 0.7.8 - Final release
+
+- Fixed bug where the event overlay won't work when completing an RPG/ITL song in Waterfall environment
+- Added reload songs menu from the song select screen (ITGmania only)
+
+With the release of ITGmania, my vision for Waterfall Expanded is to continue to support all features in a way that it is a single theme download for all Stepmania/ITGmania releases. Given that ITGmania has been released and is now in active development, I simply don't have time to continue developing on the vision I have for it. I have added the quick reload songs feature to the songwheel (ITGmania only), but none of the other ITGmania-specific features will be functional in WFE (you will still have to run this with groovestats launcher)
+
+With that being said, this is the final release of Waterfall Expanded from me.
+
+Thank you everybody who showed interest in Waterfall Expanded by using it and/or contributing ideas/code to the theme. It was a lot of fun and a challenge to keep up with events while implementing a lot of the ideas I had for theming. If anybody would like to take over the development, please feel free. I'd be happy to help if you need. 
+
+And of course, thanks to SteveReen for Waterfall, a great theme and I can't wait to see what you've got cooking up!
+
+2022-06-17 - Minor Tweaks. No version number change here
+
+- ITGmania support, but it does not have support for any of the new ITGmania features. You will still need to run through GS Launcher.
+- Removed the banner from one of the panes of the event overlay because it was overlapping some of the text of RPG
+- Fixed crashing caused by GS overlay
+
+2022-06-06 - 0.7.7 - SRPG6
+
+If you are using a version of WFE that worked for ITL and are planning to play in SRPG6, this update is required
+
+Changes
+All functionality for SRPG6 is working for when it comes out s o o n
+
+Songwheel
+    - Removed ITL Song points bar as it was causing problems for a lot of people.
+    - Chart description no longer remains from the old song 
+
+Gameplay
+    - Occasional game freezing fixed maybe
+    - Score box no longer shows scores from previous songs in course mode
+
+Evaluation Screen
+    - RPG, ITL, GS score panes available, and will show if results are returned from groovestats
+    - Now has the song banner/song name on the event overlay
+    - Doubles scores are now more obvious
+    - Bottom section now combines density, judgments, and lifebar all in one graph
+
+Other
+    - A few bugfixes
+
+Note: If you still want the ITL Song bar points, copy the Scripts/WF-Profiles.lua and Graphics/MusicWheelItem Song NormalPart.lua from 0.7.6.2 into this one
+
+---------------
+
+Changelog
+
+2022-04-28 - 0.7.6.2 - ITL QoL + stuff
+
+This was just supposed to be only the ITL songwheel points bar thing but there were a lot of errors so it took a while. I had a lot of code shared to me by other people recently, so I put all of that in too.
+
+New Player options:
+	- Column cues to show an upcoming mine/arrow. Mainly to tell Kigha there's a left arrow mine at the start of [12] SHUM (but she'll still hit it).
+	- Offset Display in milliseconds to show dimo just how tight his timing is.
+	- Effect/Accel/Appearance mods are back in under the "Fun Options" menu.
+
+ITL/EX scoring changes:
+	- Bars to display your ITL points/EX score/bonus on the songwheel
+	- Points earned on the evaluation screen
+	- EX Score is shown on the WF pane
+	- When EX Scoring display is on, evaluation screen will always show the EX score instead of doing the flash every few seconds
+	
+Other:
+	- Outfox support without having to modify files
+	- "New profile" bug should be fixed
+	- Groovestats score box should no longer crash occasionally 
+	- Keyboard features theme option is now required to be enabled to use Ctrl+R quick restart
+	- When there is only one difficulty for a given song, the songwheel will display the score for that difficulty regardless of what difficulty is currently selected
+
+Thank you very much to Daikyi, Jewel, teejusb, and Zankoku for various contributions to this release <3
+
+Note for ITL score bars:
+
+The point values may not 100% accurate because prior to this release, we did not track best EX score.
+If you are having problems with song rankings and point values, make sure you download the latest ITL song patches, and delete the cache for the ITL directory
+You can separate your ITL songs by difficulty, just make sure the folder names contain "ITL Online 2022", e.g. "ITL Online 2022 [07]" will work
+If you are still having problems with the ITL song wheel or have any questions about it, ask in ITC discord #themes / DM me or Daikyi on discord
+
+---------------
+
+0.7.6.1 - Bug fixes
+This is a small update to correct some of the problems due to a rushed release of ITL.
+
+- Overhauled Subtractive Scoring. "Subtractive Scoring environment" now available. "Default" will choose EX score if enabled, and whatever your environment is if not.
+- EX Score display on reverse scroll positioning fixed
+- Evaluation screen will now always show the EX score regardless of if you turned EX score on or not
+- Everything in course mode *should* work now.
+- LotusFlower now has an ITG environment font, thanks mute!
+
+---------------
+
+0.7.6 - ITL 2022 update with some other stuff
+
+Additions
+- "Keyboard features" theme option. You will need to enable this to enable song search.
+- Added all functionality required for ITL2022 launches, including EX scoring system, GS submission, leaderboard, and EX scoring
+- Added Score Pace to subtractive scoring options to show the score you are on pace to get. Useful particularly in long bois.
+- Included RAKKII's new judgment fonts
+
+Changes
+- Switched the GS box to the SL 5.1.0 version (thanks teejusb!)
+- Measure counter no longer overlaps text
+- Header now inherits screen darkening setting
+- Screen Darken is now a number from 0 (off) to 1 (fully dark). Old values were Dark = 0.5, Darker = 0.75, Darkest = 0.95
+- Fixed incorrect counts on the evaluation screen if you keep playing after ITG failing.
+
+Notes:
+
+I didn't have a lot of time to get the ITL things across the board, so there are a few things related to EX scoring and the leaderboard
+that won't work as expected, but they are very minor and may not even get noticed. I should hopefully fix it by the time it matters. 
+
+---------------
+
+2022-02-26 - 0.7.5
+
+Additions
+- No mines option. Comes with a few features to show that the user disabled mines
+- Fail Alert option. This gives an alert when you ITG and WF fail. Mostly useful when you play in WF mode and want to know when you ITG fail since the lifebars don't align.
+- CD titles on the songwheel
+- Peak NPS text brought back
+- Scene Switcher added a "GameMode" file
+- Included judgment fonts made by Jkurs and EightBitDerp
+- Included WF noteskins. Devmetal and Devcel include a proper graphic for Lift arrows
+- Small prompt at the start of every song to tell you what mods you have set e.g. mirror, no mines, M Mod, etc.
+
+Changes
+- Evaluation Screen Music now allows you to have pass/fail specific sounds
+- Step statistics now inherits Screen Filter setting, so you can see more of the song's background on lighter background filters
+- Added turn mod and shuffle/blender into the GS comment submission 
+- Fixed alignment on error bar and other stuff during 2 player with step stats enabled
+
+---------------
+
+2021-11-28 - 0.7.2 - Mostly a bugfix update
+Additions
+- Easter egg for Kerpa 
+
+Changes
+- Held miss tracking option removed, now always enabled
+- Fixed side tick positioning
+- Stream Lookahead breaks weren't being shown in some cases
+- Preferred fault window wasn't working in some cases
+- Held miss tracking no longer keeps counting after failing
+
+
+---------------
+
+2021-11-17 - 0.7.1 (yay im finally version numbering)
+Additions
+- Custom lookahead count in advanced options menu up to 5 streams ahead. 0 replaces "Hide Lookahead"
+- "No descending zoom" will not sequentially reduce the size of the upcoming measure counter text
+- "Preferred Fault Window" in customize profile menu to set the fault window setting when the set begins
+- Added Nyan Cat gif
+- Added "Side Tick" as an early/late judgement option
+- "Colored Subtractive" will color your subtractive scoring text on what kind of combo it is on the other environment
+- "Subtractive Scoring Style" extra options
+
+Changes
+- Getting boys now correctly resets the the Rainbow scroll and combo growth mod
+- Fixed measure counter move up
+- Fixed invisible menu bug
+- Better synced Dancing Duck, catJAM, crabPls, Snoop Dogg
+- Added in some logic to the Groovestats submission comment for when EvilDave219 plays on the theme
+
+---------------
+
+2021-11-02
+Additions
+- Groovestats overlay now includes SRPG5 leaderboards 
+
+Changes
+- Groovestats Submission comment is now much longer but more information and more readable
+- Added some transparency to the WF surround lifebar so it doesn't look as garbage (but still garbage, don't use it)
+- Time and song info details changed a bit
+- Removed system message when playing doubles with surround lifebar (oops)
+- Marathon mode now works
+
+---------------
+
+2021-10-26
+Additions
+- Vertical and Surround lifebar added back into WF (don't use the surround bar in WF mode, it's ugly AF)
+- Fixed a few behind the scenes errors
+- Added a Crush, Encoder, and Oceanlab measure counter for an easier display of how much stream you have left
+
+---------------
+
+2021-10-24
+Additions
+- New GIFs to choose from, GIF code changed a bit
+- More fun judgement and combo modifiers
+
+Changes
+- Mines now remove the rainbow combo in WF mode
+- Preferred environment now works properly
+- Time elapsed now correctly stops the timer when you fail in ITG mode
+- Improved GS Overlay
+
+---------------
+
+2021-10-21 - Release 0.7.0 (I wasn't version numbering yet lol)
+
+
+
+
+
