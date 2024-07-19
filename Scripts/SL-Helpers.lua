@@ -38,44 +38,52 @@ VersionNumber=function()
 	return ProductID(), ProductVersion()
 end
 
-ALLOW_SM_53 = true
+local getProductVersion = function()
+  if type(ProductVersion) ~= "function" then
+    return {}
+  end
+
+  -- get the version string, e.g. "5.0.11" or "5.1.0" or "5.2-git-96f9771" or etc.
+  local version = ProductVersion()
+  if type(version) ~= "string" then
+    return {}
+  end
+
+  -- remove the build suffix from the version string
+  -- debug build are suffixed with "-git-$something" or "-UNKNOWN" if the
+  -- git hash is not available for some reason
+  version = version:gsub("-.*", "")
+
+  -- parse the version string into a table
+  local v = {}
+  for i in version:gmatch("[^%.]+") do
+    table.insert(v, tonumber(i))
+  end
+
+  return v
+end
+
+function IsMinimumProductVersion(...)
+  local version = getProductVersion()
+
+  for i = 1, select("#", ...) do
+    local n = select(i, ...)
+    if not version[i] or version[i] < n then
+      return false
+    elseif version[i] > n then
+      return true
+    end
+  end
+
+  return true
+end
 
 StepManiaVersionIsSupported = function()
 	--SM(ProductID())
     -- outfox renamed away from 5.3 as of v0.4.14, if productID contains outfox we know it has full support
-	if type(ProductID) == "function" and ProductID():find("ITGmania") then return true end
-
-    if type(ProductID) == "function" and ProductID():find("OutFox") then return true end
-
-    -- if we're not using outfox, ensure that we're using StepMania
-    if type(ProductFamily) ~= "function" or ProductFamily():lower() ~= "stepmania" then return false end
-
-	-- ensure that a global ProductVersion() function exists before attempting to call it
-	if type(ProductVersion) ~= "function" then return false end
-
-	-- get the version string, e.g. "5.0.11" or "5.1.0" or "5.2-git-96f9771" or etc.
-	local version = ProductVersion()
-	if type(version) ~= "string" then return false end
-
-	-- remove the git hash if one is present in the version string
-	version = version:gsub("-.+", "")
-
-	-- split the remaining version string on periods; store each segment in a temp table
-	local t = {}
-	for i in version:gmatch("[^%.]+") do
-		table.insert(t, tonumber(i))
-	end
-
-	-- if we didn't detect SM5.x.x then Something Is Terribly Wrong.
-	if not (t[1] and t[1]==5) then return false end
-
-	-- SM5.0.x is supported
-	-- SM5.1.x is supported
-	-- SM5.2 is not supported because it saw significant backwards-incompatible API changes and is now abandoned
-	-- SM5.3 is up in the air, but supported if you set the above variable to true
-	if not (t[2] and (t[2]==0 or t[2]==1 or (t[2]==3 and ALLOW_SM_53))) then return false end
-
-	return true
+	if type(ProductID) == "function" and ProductID():find("ITGmania") then 
+        return IsMinimumProductVersion(0, 8, 0)
+    end
 end
 
 -- -----------------------------------------------------------------------
