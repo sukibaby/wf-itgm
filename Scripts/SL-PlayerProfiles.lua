@@ -16,6 +16,7 @@ local profile_whitelist = {
 	EarlyLate = "string",
 	EarlyLateColor = "string",
 	BackgroundFilter = "string",
+    VisualDelay = "string",
 
 	HideTargets = "boolean",
 	HideSongBG = "boolean",
