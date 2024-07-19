@@ -195,40 +195,42 @@ local combo_bmt = LoadFont("_Combo Fonts/Wendy/Wendy")..{
 			if combo == 0 then self:rainbowscroll(false) end			
 		end
 		
--- Wild combo counter, an amalgamation of amazing ideas
-if mods.ComboEffectsWild then
-    local nfw = GetNotefieldWidth(pn) / 2
-    self:rotationz(math.random(1, 360))
-        :zoom(math.random() * combo / math.min(100, combo))
-        :xy(math.random(-nfw, nfw), math.random(-nfw, nfw))
+        -- Wild combo counter, an amalgamation of amazing ideas
+        if mods.ComboEffectsWild then
+            local nfw = GetNotefieldWidth(pn) / 2
+            self:rotationz(math.random(1, 360))
+                :zoom(math.random() * combo / math.min(100, combo))
+                :xy(math.random(-nfw, nfw), math.random(-nfw, nfw))
 
-    local rand = math.random()
-    if params.Misses then
-        self:rainbowscroll(false):stopeffect():diffuse(Color.Red)
-    else
-        local colorIndex = math.ceil(rand * 5)
-        local color = colorIndex < 5 and colors["FullComboW" .. (colorIndex - 1)][2] or Color.White
-        self:rainbowscroll(colorIndex == 1):stopeffect():diffuse(color)
-    end
-end,
-JudgmentMessageCommand = function(self, params)
+            local rand = math.random()
+            if params.Misses then
+                self:rainbowscroll(false):stopeffect():diffuse(Color.Red)
+            else
+                local colorIndex = math.ceil(rand * 5)
+                local color = colorIndex < 5 and colors["FullComboW" .. (colorIndex - 1)][2] or Color.White
+                self:rainbowscroll(colorIndex == 1):stopeffect():diffuse(color)
+            end
+        end
+    end,
+    JudgmentMessageCommand = function(self, params)
     if params.Player ~= player then return end
     if (not useitg) and params.TapNoteScore and (params.TapNoteScore == "TapNoteScore_HitMine") then
         self:settext(""):zoom(0.75)
         if mods.ComboRainbow ~= "None" then self:rainbowscroll(false) end
     end
-end,
--- Responsive combo. InputHandler in \BGAnimations\ScreenGameplay overlay\default.lua
-ButtonPressMessageCommand = function(self, params)
-    if params.Player == player then
-        local moveAmount = mods.ComboEffectsResponsiveInverse and -1.5 or 1.5
-        if params.Button == "Left" or params.Button == "Right" then
-            self:addx(params.Button == "Left" and moveAmount or -moveAmount)
-        elseif params.Button == "Up" or params.Button == "Down" then
-            self:addy(params.Button == "Up" and moveAmount or -moveAmount)
+    end,
+    -- Responsive combo. InputHandler in \BGAnimations\ScreenGameplay overlay\default.lua
+    ButtonPressMessageCommand = function(self, params)
+        if params.Player == player then
+            local moveAmount = mods.ComboEffectsResponsiveInverse and -1.5 or 1.5
+            if params.Button == "Left" or params.Button == "Right" then
+                self:addx(params.Button == "Left" and moveAmount or -moveAmount)
+            elseif params.Button == "Up" or params.Button == "Down" then
+                self:addy(params.Button == "Up" and moveAmount or -moveAmount)
+            end
         end
     end
-end
+}
 
 af[#af+1] = combo_bmt
 
