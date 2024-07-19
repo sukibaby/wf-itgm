@@ -29,6 +29,7 @@ local PlayerDefaults = {
 				MeasureCounter = "None",
 				MeasureCounterLeft = true,
 				MeasureCounterUp = false,
+                MeasureLines = "Off",
 				DataVisualizations = "None",
 				TargetScore = 1,
 				ActionOnMissedTarget = "Nothing",
@@ -37,6 +38,7 @@ local PlayerDefaults = {
 				NPSGraphAtTop = false,	
 				EXScoring = false,
 				ColumnCues = false,
+                ColumnCountdown = false,
 				OffsetDisplay = false,
 
 				-- New step stats stuff

@@ -34,6 +34,8 @@ local profile_whitelist = {
 	MeasureCounterUp = "boolean",
 	HideLookahead = "boolean",
 
+    MeasureLines = "string",
+
 	ColumnFlashOnMiss = "boolean",
 	SubtractiveScoring = "string",
 	SubtractiveExtra = "boolean",
@@ -101,6 +103,7 @@ local profile_whitelist = {
 	EXScoring = "boolean",
 	SubtractiveEnvironment = "string",
 	ColumnCues = "boolean",
+    ColumnCountdown = "boolean",
 	OffsetDisplay = "boolean",
 
 }
