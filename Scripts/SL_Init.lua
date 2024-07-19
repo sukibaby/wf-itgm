@@ -216,6 +216,7 @@ SL = {
 			RegenComboAfterMiss=5,
 			MaxRegenComboAfterMiss=10,
 			MinTNSToHideNotes="TapNoteScore_W3",
+			MinTNSToScoreNotes = ThemePrefs.Get("RescoreEarlyHits") and "TapNoteScore_W3" or "TapNoteScore_None",
 			HarshHotLifePenalty=true,
 
 			PercentageScoring=true,
@@ -237,6 +238,7 @@ SL = {
 			RegenComboAfterMiss=5,
 			MaxRegenComboAfterMiss=5,
 			MinTNSToHideNotes="TapNoteScore_W4",
+			MinTNSToScoreNotes = ThemePrefs.Get("RescoreEarlyHits") and "TapNoteScore_W4" or "TapNoteScore_None",
 			HarshHotLifePenalty=false,
 
 			PercentageScoring=true,

@@ -393,10 +393,7 @@ local t = Def.ActorFrame {
 		end
 
 		-- Reload songs, feature for ITGmania only
-		local product = VersionNumber()
-		if product:find("ITGmania") then
-			table.insert(wheel_options, {"TakeABreather", "LoadNewSongs"})
-		end
+		table.insert(wheel_options, {"TakeABreather", "LoadNewSongs"})
 
 		if not GAMESTATE:IsCourseMode() then
 			if ThemePrefs.Get("KeyboardFeatures") then				
