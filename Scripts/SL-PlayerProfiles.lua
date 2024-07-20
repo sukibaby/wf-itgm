@@ -72,8 +72,6 @@ local profile_whitelist = {
 	GIFRandom = "boolean",
 
 	ComboEffectsWild = "boolean",
-	ComboEffectsResponsive = "boolean",
-	ComboEffectsResponsiveInverse = "boolean",
 	ComboEffectsNice = "boolean",
 
 	ComboStretchHorizontal = "boolean",

@@ -213,23 +213,12 @@ local combo_bmt = LoadFont("_Combo Fonts/Wendy/Wendy")..{
         end
     end,
     JudgmentMessageCommand = function(self, params)
-    if params.Player ~= player then return end
-    if (not useitg) and params.TapNoteScore and (params.TapNoteScore == "TapNoteScore_HitMine") then
-        self:settext(""):zoom(0.75)
-        if mods.ComboRainbow ~= "None" then self:rainbowscroll(false) end
-    end
-    end,
-    -- Responsive combo. InputHandler in \BGAnimations\ScreenGameplay overlay\default.lua
-    ButtonPressMessageCommand = function(self, params)
-        if params.Player == player then
-            local moveAmount = mods.ComboEffectsResponsiveInverse and -1.5 or 1.5
-            if params.Button == "Left" or params.Button == "Right" then
-                self:addx(params.Button == "Left" and moveAmount or -moveAmount)
-            elseif params.Button == "Up" or params.Button == "Down" then
-                self:addy(params.Button == "Up" and moveAmount or -moveAmount)
-            end
+        if params.Player ~= player then return end
+        if (not useitg) and params.TapNoteScore and (params.TapNoteScore == "TapNoteScore_HitMine") then
+            self:settext(""):zoom(0.75)
+            if mods.ComboRainbow ~= "None" then self:rainbowscroll(false) end
         end
-    end
+    end,
 }
 
 af[#af+1] = combo_bmt
