@@ -1,7 +1,5 @@
-# Waterfall Expanded-suki
+# Waterfall for ITGmania 0.8.0+
 
-_A modified fork of SteveReen / zarzob's Waterfall theme for StepMania 5 / ITGmania_
+_Based on zarzob's Waterfall Expanded v0.7.8, which itself is a modified fork of SteveReen's Waterfall theme_
 
-Requires ITGmania 0.8.0 or newer.
-
-Based on Waterfall Expanded v0.7.8
+This features general updates, performance improvements, and support for ITGmania specific features (visual delay, engine recalcs, etc)

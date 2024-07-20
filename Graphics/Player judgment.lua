@@ -69,10 +69,19 @@ local af = Def.ActorFrame{
 		
 		if not usetext then
 			local frame = TNSFrames[TNSToUse]
+			-- most judgment sprite sheets have 12 or 14 frames; 6/7 for early judgments, 6/7 for late judgments
+			-- some (the original 3.9 judgment sprite sheet for example) do not visibly distinguish
+			-- early/late judgments, and thus only have 6/7 frames
+			if sprite:GetNumStates() == 12 or sprite:GetNumStates() == 14 then
+				frame = frame * 2
+				if not param.Early then frame = frame + 1 end
+			end
 			if not frame then return end
 
 			if TNSToUse == "TapNoteScore_W1" and threshold > 0 and math.abs(TNO) > threshold then
-				frame = 1
+				if sprite:GetNumStates() == 14 then
+					if param.Early then frame = 2 else frame = 3 end
+				end
 			end
 
 			self:playcommand("Reset")
