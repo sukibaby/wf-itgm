@@ -69,9 +69,9 @@ if GAMESTATE:IsCourseMode() then
 	if trail then
 		local entries = trail:GetTrailEntries()
 		for i, entry in ipairs(entries) do
-			-- In the engine, TrailUtil.GetTotalSeconds() adds up song.GetLastSecond
+			-- In the engine, TrailUtil.GetTotalSeconds() adds up song.MusicLengthSeconds
 			-- so let's use the same method here for consistency.
-			seconds = seconds + (entry:GetSong():GetLastSecond() / rate)
+			seconds = seconds + (entry:GetSong():MusicLengthSeconds() / rate)
 			table.insert(cumulative_seconds, seconds)
 		end
 	end
@@ -86,20 +86,20 @@ local seconds_offset = 0
 -- it's potentially dangerous for framerate
 
 local Update = function(af, delta)
-    if not alive then return end
+	if not alive then return end
 
-    local musicSeconds = SongPosition:GetMusicSeconds()
-    -- Use a single calculation for musicSeconds adjusted by rate and offset
-    local adjustedMusicSeconds = (musicSeconds / rate) + seconds_offset
-    -- Clamp the value of musicSeconds to 0 if it's negative
-    adjustedMusicSeconds = math.max(0, adjustedMusicSeconds)
+	-- SongPosition:GetMusicSeconds() can be negative for a bit at
+	-- the beginnging depending on how the stepartist set the offset
+	-- don't show negative time; just use 0
+	if SongPosition:GetMusicSeconds() < 0 then
+		curBMT:settext(fmt(seconds_offset))
+		remBMT:settext(fmt(totalseconds - seconds_offset))
+		return
+	end
 
-    -- Calculate remaining time once and reuse
-    local remainingTime = totalseconds - adjustedMusicSeconds
-    remainingTime = math.max(0, remainingTime) -- Ensure remaining time is not negative
-
-    curBMT:settext(fmt(adjustedMusicSeconds))
-    remBMT:settext(fmt(remainingTime))
+	curBMT:settext( fmt((SongPosition:GetMusicSeconds() / rate) +  seconds_offset) )
+	remBMT:settext( fmt(clamp(totalseconds - seconds_offset - (SongPosition:GetMusicSeconds()/rate), 0, totalseconds)) )
+	
 end
 
 -- -----------------------------------------------------------------------
@@ -142,38 +142,56 @@ local af = Def.ActorFrame {
 		self:zoom(zoom)
 	end
 }
--- Define a helper function to create text actors to reduce redundancy
-local function CreateTextActor(name, yPos, horizAlign, setText)
-    return LoadFont("Common Normal")..{
-        InitCommand=function(self)
-            self:y(row_height * yPos)
-            self:horizalign(horizAlign)
-            if setText then self:settext(setText) end
-        end,
-        [(useitg and "ITG" or "WF") .. "FailedMessageCommand"]=function(self)
-            self:diffuse(color("#ff3030"))
-            alive = false
-        end
-    }
-end
 
 -- Time Elapsed
-af[#af+1] = CreateTextActor("TimeElapsed", 1, (pnum == 1) and left or right)
+af[#af+1] = LoadFont("Common Normal")..{
+	InitCommand=function(self)
+		curBMT = self
+		--self:x(0)
+		self:y(row_height*1)
+		self:horizalign((pnum == 1) and left or right)
+	end,
+	[(useitg and "ITG" or "WF") .. "FailedMessageCommand"]=function(self, params)
+		self:diffuse(color("#ff3030"))
+		alive = false
+	end
+}
 
--- Time Remaining
-af[#af+1] = CreateTextActor("TimeRemaining", 2, (pnum == 1) and left or right)
+---- Time Remaining
+af[#af+1] = LoadFont("Common Normal")..{
+	InitCommand=function(self)
+		remBMT = self
+		self:y(row_height*2)
+		self:horizalign((pnum == 1) and left or right)
+	end,
+	[(useitg and "ITG" or "WF") .. "FailedMessageCommand"]=function(self, params)
+		self:diffuse(color("#ff3030"))
+		alive = false
+	end
+}
 
--- Total time
-af[#af+1] = CreateTextActor("TotalTime", 3, (pnum == 1) and left or right, fmt(totalseconds))
+---- Total time
+af[#af+1] = LoadFont("Common Normal")..{
+	InitCommand=function(self)
+		self:settext(fmt(totalseconds))
+		self:y(row_height*3)
+		self:horizalign((pnum == 1) and left or right)
+		totalwidth = -self:GetWidth() - 5
+	end,
+}
 
 -- Labels
-for i, label in ipairs(labels) do
-    af[#af+1] = CreateTextActor("Label"..i, i, (pnum == 1) and left or right, label)
-    :InitCommand(function(self)
-        -- Adjust the x position based on totalwidth calculation
-        self:x(totalwidth*(pnum*2-3))
-    end)
+for i, label in ipairs(labels) do		
+	af[#af+1] = LoadFont("Common Normal")..{
+		InitCommand=function(self)
+			self:x(totalwidth*(pnum*2-3)) -- put the label close to the number
+			self:y(row_height*i)
+			self:settext(label)
+			self:horizalign((pnum == 1) and left or right) -- invert so the value is easier to see while playing
+		end,
+	}
 end
+
 
 af.CurrentSongChangedMessageCommand=function(self,params)
 	-- GAMESTATE:GetCourseSongIndex() is 0-indexed, which we'll use to our advantage here
