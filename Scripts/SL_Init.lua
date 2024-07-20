@@ -70,8 +70,6 @@ local PlayerDefaults = {
 				GIFRandom = false,
 			
 				ComboEffectsWild = false,
-				ComboEffectsResponsive = false,
-				ComboEffectsResponsiveInverse = false,
 				ComboEffectsNice = false,
 
 				ComboStretchGrow = false,

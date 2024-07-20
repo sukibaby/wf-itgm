@@ -511,21 +511,17 @@ local Overrides = {
 	--},	
 	ComboEffects = {
 		SelectType = "SelectMultiple",
-		Values = { "Wild", "Nice", "Responsive", "Inverse Responsive" },
+		Values = { "Wild", "Nice" },
 		LoadSelections = function(self, list, pn)
 			local mods = SL[ToEnumShortString(pn)].ActiveModifiers
 			list[1] = mods.ComboEffectsWild					or false
 			list[2] = mods.ComboEffectsNice					or false
-			list[3] = mods.ComboEffectsResponsive			or false
-			list[4] = mods.ComboEffectsResponsiveInverse	or false			
 			return list
 		end,
 		SaveSelections = function(self, list, pn)
 			local mods, playeroptions = GetModsAndPlayerOptions(pn)
 			mods.ComboEffectsWild				= list[1]
 			mods.ComboEffectsNice				= list[2]
-			mods.ComboEffectsResponsive 		= list[3]
-			mods.ComboEffectsResponsiveInverse 	= list[4]
 		end,
 	},
 	ComboStretch = {
