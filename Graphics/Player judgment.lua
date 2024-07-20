@@ -53,6 +53,7 @@ local af = Def.ActorFrame{
 			local window = DetermineTimingWindow(param.TapNoteOffset, "ITG")
 			TNSToUse = "TapNoteScore_W"..window
 		end
+        if TNSToUse == "TapNoteScore_AvoidMine" then return end
 		
 		local judgement = usetext and text or sprite
 		local TNO = param.TapNoteOffset or 0

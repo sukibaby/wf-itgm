@@ -218,6 +218,8 @@ local combo_bmt = LoadFont("_Combo Fonts/Wendy/Wendy")..{
             self:settext(""):zoom(0.75)
             if mods.ComboRainbow ~= "None" then self:rainbowscroll(false) end
         end
+        local tns = ToEnumShortString(params.TapNoteScore)
+        if tns == "AvoidMine" then return end
     end,
 }
 
