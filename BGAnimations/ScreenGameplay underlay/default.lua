@@ -28,7 +28,6 @@ for player in ivalues(Players) do
 	t[#t+1] = LoadActor("./PerPlayer/Score.lua", player)
 	t[#t+1] = LoadActor("./PerPlayer/DifficultyMeter.lua", player)
 	t[#t+1] = LoadActor("./PerPlayer/LifeMeter/default.lua", player)
-	t[#t+1] = LoadActor("./PerPlayer/ColumnFlashOnMiss.lua", player)
 	
 	-- I'll put the custom measure counters in a separate file to avoid clutter and potentially messing something up which creates lag lol
 	t[#t+1] = LoadActor("./PerPlayer/MeasureCounter.lua", player)
@@ -54,8 +53,8 @@ for player in ivalues(Players) do
 	t[#t+1] = LoadActor("./PerPlayer/FailTracker.lua", player)
 	t[#t+1] = LoadActor("./PerPlayer/DisplayMods.lua", player)
 
-	-- Column Cues for upcoming notes
-	t[#t+1] = LoadActor("./PerPlayer/ColumnCues.lua", player)
+	-- all the NoteField stuff is here
+	t[#t+1] = LoadActor("./PerPlayer/NoteField/default.lua", player)
 end
 
 -- add to the ActorFrame last; overlapped by StepStatistics otherwise

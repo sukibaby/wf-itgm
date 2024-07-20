@@ -341,6 +341,19 @@ local Overrides = {
 		end
 	},
 	-------------------------------------------------------------------------
+    MeasureLines = {
+        Values = { "Off", "Measure", "Quarter", "Eighth" },
+        SaveSelections = function(self, list, pn)
+            local mods, playeroptions = GetModsAndPlayerOptions(pn)
+
+            for i=1,#self.Choices do
+                if list[i] then
+                    mods.MeasureLines = self.Choices[i]
+                end
+            end
+        end
+    },
+	-------------------------------------------------------------------------
 	Stepchart = {
 		ExportOnChange = true,
 		Choices = function()
@@ -609,7 +622,7 @@ local Overrides = {
 	-------------------------------------------------------------------------
 	GameplayExtras = {
 		SelectType = "SelectMultiple",
-		Values = { "ColumnFlashOnMiss", "SubtractiveExtra", "ColumnCues" }
+		Values = { "ColumnFlashOnMiss", "SubtractiveExtra", "ColumnCues" , "ColumnCountdown"}
 		--Values = function()
 		--	-- GameplayExtras will be presented as a single OptionRow when WideScreen
 		--	local vals = { "ColumnFlashOnMiss", "SubtractiveScoring", "SubtractiveExtra" }
