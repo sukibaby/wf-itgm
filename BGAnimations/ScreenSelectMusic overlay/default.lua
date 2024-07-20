@@ -5,7 +5,24 @@ local t = Def.ActorFrame{
 	-- if ScreenGameplay is being entered "properly" or being reloaded by a scripted mod-chart.
 	-- If we're here in SelectMusic, set GameplayReloadCheck to false, signifying that the next
 	-- time ScreenGameplay loads, it should have a properly animated entrance.
-	InitCommand=function(self) SL.Global.GameplayReloadCheck = false
+	InitCommand=function(self) 
+        SL.Global.GameplayReloadCheck = false
+        generateFavoritesForMusicWheel()
+	end,
+
+	PlayerProfileSetMessageCommand=function(self, params)
+		if not PROFILEMAN:IsPersistentProfile(params.Player) then
+			LoadGuest(params.Player)
+		end
+		generateFavoritesForMusicWheel()
+		ApplyMods(params.Player)
+	end,
+
+	PlayerJoinedMessageCommand=function(self, params)
+		if not PROFILEMAN:IsPersistentProfile(params.Player) then
+			LoadGuest(params.Player)
+		end
+		ApplyMods(params.Player)
 	end,
 
 	-- ---------------------------------------------------
