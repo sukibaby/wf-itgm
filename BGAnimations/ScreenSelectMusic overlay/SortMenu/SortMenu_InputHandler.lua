@@ -68,6 +68,30 @@ local function input(event)
 					--overlay:GetChild("PaneDisplayMaster"):GetChild("GetScoresRequester"):playcommand("Cancel")
 					overlay:playcommand("DirectInputToEngine")
 					SCREENMAN:SetNewScreen("ScreenReloadSongsSSM")
+				elseif focus.new_overlay == "AddFavorite" then
+					addOrRemoveFavorite(event.PlayerNumber)
+					-- Nudge the wheel a bit so that that the icon is correctly updated.
+					overlay:queuecommand("DirectInputToEngine")
+					local screen = SCREENMAN:GetTopScreen()
+					screen:GetMusicWheel():Move(1)
+					screen:GetMusicWheel():Move(-1)
+					screen:GetMusicWheel():Move(0)
+				elseif focus.new_overlay == "Preferred" then
+					-- Only allow sorting by favorites if there are favorites available
+					if (#SL[ToEnumShortString(event.PlayerNumber)].Favorites > 0) then
+						-- The 2nd argument, isAbsolute, is ITGmania 0.6.0 specific. It
+						-- allows absolute paths to be used for the favorites file which is
+						-- how it works to load from the profile directory.
+						SONGMAN:SetPreferredSongs(getFavoritesPath(event.PlayerNumber), --[[isAbsolute=]]true);
+						if SONGMAN:GetPreferredSortSongs() then
+							overlay:queuecommand("DirectInputToEngine")
+							SCREENMAN:GetTopScreen():GetMusicWheel():ChangeSort("SortOrder_Preferred")
+						else 
+							SM(ToEnumShortString(event.PlayerNumber).." has no favorites!")
+						end
+					else
+						SM("No Favorites Available")
+					end
 				end
 			end
 

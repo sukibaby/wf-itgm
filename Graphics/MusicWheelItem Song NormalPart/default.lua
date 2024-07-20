@@ -31,6 +31,8 @@ end
 
 -- clear types/grades
 for player in ivalues(players) do
+    af[#af+1] = LoadActor("Favorites.lua", player)
+
 	local pn = tonumber(player:sub(-1))
 	local gradeframe = Def.ActorFrame{
 		InitCommand = function(self) self:x(28 + (pn == 1 and -WideScale(20,14) or WideScale(-2, 18))):aux(-1) end,

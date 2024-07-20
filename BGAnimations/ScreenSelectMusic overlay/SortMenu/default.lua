@@ -410,6 +410,18 @@ local t = Def.ActorFrame {
 			end
 		end
 
+        if GAMESTATE:GetCurrentSong() ~= nil then
+            table.insert(wheel_options, {"ImLovinIt", "AddFavorite"})
+        end
+
+        for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+            local path = getFavoritesPath(player)
+            if FILEMAN:DoesFileExist(path) then
+                table.insert(wheel_options, {"MixTape", "Preferred"})
+                break
+            end
+        end
+
 		-- Override sick_wheel's default focus_pos, which is math.floor(num_items / 2)
 		--
 		-- keep in mind that num_items is the number of Actors in the wheel (here, 7)
