@@ -72,7 +72,7 @@ local text = LoadFont("_wendy small")..{
 
 local af = Def.ActorFrame{
     InitCommand = function(self)
-        self:xy(GetNotefieldX(player), _screen.cy)
+        self:xy(GetNotefieldX(player), _screen.cy + 5)
     end,
 	UpdateBGFilterPositionMessageCommand=function(self, params)
 		if params.Player == player then

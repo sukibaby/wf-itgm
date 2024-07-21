@@ -1,12 +1,24 @@
-local player = ...
+local player, layout = ...
 local pn = ToEnumShortString(player)
 local p = tonumber(player:sub(-1))
 local mods = SL[pn].ActiveModifiers
 local useitg = mods.SimulateITGEnv
 
-local PlayerState = GAMESTATE:GetPlayerState(player)
-
 if mods.SubtractiveScoring ~= "Score Pace" then return end
+
+local useitg = mods.SimulateITGEnv
+local subType = mods.SubtractiveScoring
+local subEnv = mods.SubtractiveEnvironment
+
+if subEnv == "Default" then 
+	if mods.EXScoring then 
+		subEnv = "EX"
+	else 
+		subEnv = useitg and "ITG" or "Waterfall" 	
+	end
+end
+
+local PlayerState = GAMESTATE:GetPlayerState(player)
 
 -- Pace option introduced in Waterfall 0.7.6
 -- This shows the score you are on pace to get rather than "if you quad the rest"
@@ -18,10 +30,16 @@ if mods.SubtractiveScoring ~= "Score Pace" then return end
 local alive = true
 
 -- Don't show up at the beginning because the number is prety useless with such a small sample size
--- Start displaying after 100 dance points
--- which is 20 fantastics or masterfuls
+-- Start displaying after about 20 notes in
+
+-- 0.7.6.1 update: EX score added
+
 local display = false
-local startDisplay = useitg and 100 or 200
+local startDisplay = {
+	ITG = 100,
+	Waterfall = 200,
+	EX = 70
+}
 
 local updateEvery = 2 -- How many measures wait to update. 1 seems like too often
 
@@ -35,6 +53,10 @@ local maxcombotype = useitg and 4 or 3
 
 local bmt = LoadFont(font)
 
+local dp_poss
+local dp_currPoss
+local dp
+
 local Update = function(self)	
 
 	if alive then
@@ -44,11 +66,22 @@ local Update = function(self)
 		-- If a new measure has occurred
 		if math.floor(currMeasure) > prevMeasure then
 			prevMeasure = math.floor(currMeasure)
-			local dp_poss = (useitg) and WF.ITGMaxDP[p] or pss:GetPossibleDancePoints()
-			local dp_currPoss = (useitg) and WF.ITGCurMaxDP[p] or pss:GetCurrentPossibleDancePoints()
-			local dp = (useitg) and WF.ITGDP[p] or pss:GetActualDancePoints()
 			
-			if dp_currPoss >= startDisplay then
+			if subEnv == "EX" then 
+				dp_poss = WF.GetEXMaxDP(player)
+				dp_currPoss =  WF.GetEXCurMaxDP(player)
+				dp = WF.EXDP(player)
+			elseif subEnv == "Waterfall" then
+				dp_poss = pss:GetPossibleDancePoints()
+				dp_currPoss = pss:GetCurrentPossibleDancePoints()
+				dp = pss:GetActualDancePoints()
+			else 
+				dp_poss = (useitg) and WF.ITGMaxDP[p]
+				dp_currPoss = (useitg) and WF.ITGCurMaxDP[p]
+				dp = (useitg) and WF.ITGDP[p]
+			end
+			
+			if dp_currPoss >= startDisplay[subEnv] then
 				display = true
 			end
 			
@@ -99,33 +132,41 @@ af[#af+1] = LoadFont(font)..{
 		local width = GetNotefieldWidth()
 		local NumColumns = GAMESTATE:GetCurrentStyle():ColumnsPerPlayer()
 		-- mirror image of MeasureCounter.lua
-		self:xy( GetNotefieldX(player) + (width/NumColumns), _screen.cy - 55 )
+		self:xy( GetNotefieldX(player) + (width/NumColumns), layout.y )
 		self:horizalign(left)
 		-- nudge slightly left (15% of the width of the bitmaptext when set to "100.00%")
 		self:settext("100.00%"):addx( -self:GetWidth()*self:GetZoom() * 0.15 )
 		self:settext("")
 	end,
 	WFFailedMessageCommand=function(self, params)
-		if params.pn == p and not useitg then
+		if params.pn == p and subEnv == "Waterfall" then
 			alive = false
+			
+			local dancepoints
+			if subEnv == "EX" then
+				dancepoints = WF.GetEXPercentDP(player)*100
+			else
+				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
+				dancepoints = pss:GetPercentDancePoints()*100
+			end
 
-			dance_points = pss:GetPercentDancePoints()
-			
-			percent = string.format("%.2f%%", dance_points*100)
-			
-			self:settext(percent)
-				
+			self:settext(string.format("%.2f%%",dancepoints))
+			return
 		end
 	end,
 	ITGFailedMessageCommand=function(self, params)
-		if params.pn == p and useitg then
+		if params.pn == p and (subEnv == "ITG" or subEnv == "EX") then
 			alive = false
-	
-			dance_points = WF.GetITGPercentDP(player, itgmaxdp)
 			
-			percent = string.format("%.2f%%", dance_points*100)
+			local dancepoints
+			if subEnv == "EX" then
+				dancepoints = WF.GetEXPercentDP(player)*100
+			else
+				dancepoints = WF.GetITGPercentDP(player, WF.GetITGMaxDP(player))*100
+			end
 			
-			self:settext(percent)
+			self:settext(string.format("%.2f%%",dancepoints))
+			return
 		end
 	end
 }

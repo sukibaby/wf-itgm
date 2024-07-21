@@ -7,12 +7,12 @@ local layout = GetGameplayLayout(player, opts:Reverse() ~= 0)
 local af = Def.ActorFrame{
   Name="NoteFieldContainer"..pn,
   OnCommand=function(self)
-    -- local adjusted_offset_x = mods.NoteFieldOffsetX * (player == PLAYER_1 and -1 or 1)
+    local adjusted_offset_x = mods.NoteFieldOffsetX * (player == PLAYER_1 and -1 or 1)
 
-    -- self:addy(mods.NoteFieldOffsetY)
+    self:addy(mods.NoteFieldOffsetY)
     local player = SCREENMAN:GetTopScreen():GetChild("Player"..pn)
-    -- player:addx(adjusted_offset_x)
-    -- player:addy(mods.NoteFieldOffsetY)
+    player:addx(adjusted_offset_x)
+    player:addy(mods.NoteFieldOffsetY)
 
     local notefield = player:GetChild("NoteField")
     if mods.MeasureLines == "Off" then
@@ -35,5 +35,10 @@ local af = Def.ActorFrame{
 -- The following actors should also move along with the NoteFields.
 af[#af+1] = LoadActor("ColumnFlashOnMiss.lua", player)
 af[#af+1] = LoadActor("ColumnCues.lua", player)
+af[#af+1] = LoadActor("MeasureCounter.lua", player, layout.MeasureCounter)
+af[#af+1] = LoadActor("OffsetDisplay.lua", player)
+af[#af+1] = LoadActor("SubtractiveScoring.lua", player, layout.SubtractiveScoring)
+af[#af+1] = LoadActor("SubtractiveScoringPace.lua", player, layout.SubtractiveScoring)
+af[#af+1] = LoadActor("EarlyLate.lua", player, layout.ErrorBar)
 
 return af

@@ -63,7 +63,7 @@ if NoMines and num_mines > 0 then table.insert(values,"No Mines") end
 
 local af = Def.ActorFrame{
     InitCommand = function(self)
-        self:xy(GetNotefieldX(player), SCREEN_HEIGHT/4*1.3)
+        self:xy(GetNotefieldX(player), (SCREEN_HEIGHT/4*1.3) + mods.NoteFieldOffsetY)
     end,
 	OnCommand=function(self)
 		self:sleep(5):decelerate(0.5):diffusealpha(0)

@@ -1,4 +1,4 @@
-local player = ...
+local player, layout = ...
 local pn = ToEnumShortString(player)
 local p = tonumber(player:sub(-1))
 local mods = SL[pn].ActiveModifiers
@@ -81,7 +81,7 @@ bmt.InitCommand=function(self)
 	local width = GetNotefieldWidth()
 	local NumColumns = GAMESTATE:GetCurrentStyle():ColumnsPerPlayer()
 	-- mirror image of MeasureCounter.lua
-	self:xy( GetNotefieldX(player) + (width/NumColumns), _screen.cy - 55 )
+	self:xy( GetNotefieldX(player) + (width/NumColumns), layout.y )
 	self:horizalign(left)
 	-- nudge slightly left (15% of the width of the bitmaptext when set to "100.00%")
 	self:settext("100.00%"):addx( -self:GetWidth()*self:GetZoom() * 0.15 )
