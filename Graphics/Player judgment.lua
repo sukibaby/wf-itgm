@@ -58,14 +58,8 @@ local af = Def.ActorFrame{
 		local judgement = usetext and text or sprite
 		local TNO = param.TapNoteOffset or 0
 
-		if mods.JudgementsTilt and not mods.JudgementsCumulativeTilt then
-			judgement:rotationz(TNO * 300)
-		elseif mods.JudgementsCumulativeTilt then
-			judgement:rotationz(judgement:GetRotationZ() + TNO * 100)
-		end
-
-		if mods.JudgementsRandomTilt then
-			judgement:rotationz(math.random(1,360))
+		if mods.JudgementTilt then
+			judgement:rotationz(TNO * 300 * mods.JudgementTiltMultiplier)
 		end
 		
 		if not usetext then
@@ -88,8 +82,8 @@ local af = Def.ActorFrame{
 			self:playcommand("Reset")
 			sprite:visible(true):setstate(frame)
 			
-			local wild = mods.JudgementsWild and math.random(0.625,1.5) or 1
-			local ez = mods.JudgementsWild and math.random(0.3,1.4) or 0
+			local wild = 1
+			local ez = 0
 			
 			sprite:zoom(0.8*wild):decelerate(0.1):zoom(0.75*wild):sleep(0.6):accelerate(0.2):zoom(ez)
 		else
@@ -106,39 +100,17 @@ local af = Def.ActorFrame{
 				text:diffuse(SL.JudgmentColors[mode][cind])
 			end
 			text:visible(true)
-			local bz = mods.JudgementsWild and math.random(0.625,1.5) or WF.PlainTextJudgmentBaseZoom
-			local ez = mods.JudgementsWild and math.random(0.3,1.4) or 0
+			local bz = WF.PlainTextJudgmentBaseZoom
+			local ez = 0
 			text:zoom(0.8*bz):decelerate(0.1):zoom(0.75*bz):sleep(0.6):accelerate(0.2):zoom(ez)
 		end
 
-		if mods.JudgementsWild then
-			local nfw = GetNotefieldWidth(pn)/2
-			judgement:stopeffect():rotationz(math.random(1, 360)):zoom(math.random(0.5,3)):x(math.random(-nfw, nfw)):y(math.random(-nfw, nfw))
-		end
-	end,
-	ButtonPressMessageCommand = function(self, params)
-		if params.Player ~= player then return end
-		local judgement = usetext and text or sprite
-		local moveAmount = 1.5
-		local directionMultiplier = mods.JudgementsResponsiveInverse and -1 or 1
-
-		if mods.JudgementsResponsive or mods.JudgementsResponsiveInverse then
-			if params.Button == "Left" then judgement:stopeffect():addx(-moveAmount * directionMultiplier)
-			elseif params.Button == "Right" then judgement:stopeffect():addx(moveAmount * directionMultiplier)
-			elseif params.Button == "Up" then judgement:stopeffect():addy(-moveAmount * directionMultiplier)
-			elseif params.Button == "Down" then judgement:stopeffect():addy(moveAmount * directionMultiplier)
-			end
-		end
 	end,
 	
 	Def.Sprite{
 		Name="JudgmentWithOffsets",
 		InitCommand=function(self)
 			self:animate(false):visible(false)
-
-          	local mini = mods.Mini:gsub("%%","") / 100
-			-- self:addx((GetNotefieldX(pn) * (1 + mini)) * 2)
-			-- self:addy((mods.NoteFieldOffsetY * (1 + mini)) * 2)
 
 			if string.match(tostring(SCREENMAN:GetTopScreen()), "ScreenEdit") then
 				self:Load(THEME:GetPathG("", "_judgments/Optimus Dark"))

@@ -86,12 +86,8 @@ local PlayerDefaults = {
 				NiceSoundCombo = false,
 				NiceSoundJudgements = false,
 				
-				JudgementsTilt = false,
-				JudgementsCumulativeTilt = false,
-				JudgementsResponsive = false,
-				JudgementsResponsiveInverse = false,
-				JudgementsRandomTilt  = false,
-				JudgementsWild = false,
+				JudgementTilt = false,
+                JudgementTiltMultiplier = 1.0,
 				
 				FailNotification = false,
 				

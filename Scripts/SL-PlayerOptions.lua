@@ -568,30 +568,6 @@ local Overrides = {
 			mods.NiceSoundJudgements	= list[2]
 		end,
 	},
-	Judgements = {
-		SelectType = "SelectMultiple",
-		Values = { "Tilt", "Cumulative Tilt", "Random Tilt", "Responsive", "Inverse Responsive", "Wild" },
-		LoadSelections = function(self, list, pn)
-			local mods = SL[ToEnumShortString(pn)].ActiveModifiers
-			list[1] = mods.JudgementsTilt				or false
-			list[2] = mods.JudgementsCumulativeTilt		or false
-			list[3] = mods.JudgementsRandomTilt			or false
-			list[4] = mods.JudgementsResponsive			or false
-			list[5] = mods.JudgementsResponsiveInverse	or false
-			list[6] = mods.JudgementsWild				or false
-
-			return list
-		end,
-		SaveSelections = function(self, list, pn)
-			local mods, playeroptions = GetModsAndPlayerOptions(pn)
-			mods.JudgementsTilt					= list[1]
-			mods.JudgementsCumulativeTilt		= list[2]
-			mods.JudgementsRandomTilt			= list[3]
-			mods.JudgementsResponsive			= list[4]
-			mods.JudgementsResponsiveInverse	= list[5]			
-			mods.JudgementsWild					= list[6]			
-		end,
-	},
 	-------------------------------------------------------------------------
 	TargetScore = {
 		Values = { 'C', 'B', 'A', 'AA', 'AAA', 'S', 'Machine best', 'Personal best' },
@@ -631,7 +607,7 @@ local Overrides = {
 	-- but there's a lot of options now, so always show both
 	GameplayExtrasB = {
 		SelectType = "SelectMultiple",
-		Values = { "NPSGraphAtTop", "FailNotification", "No Mines", "OffsetDisplay" },
+		Values = { "JudgementTilt", "NPSGraphAtTop", "FailNotification", "No Mines", "OffsetDisplay" },
 		LoadSelections = function(self, list, pn)
 			local mods = SL[ToEnumShortString(pn)].ActiveModifiers
 			local playeroptions = GAMESTATE:GetPlayerState(pn):GetPlayerOptionsArray("ModsLevel_Preferred")
@@ -665,43 +641,36 @@ local Overrides = {
 			end
 		end,
 	},
-	-- the original
-	-- this WAS defined in metrics.ini to only appear when not IsUsingWideScreen()
-	-- but there's a lot of options now, so always show both
-	--GameplayExtrasB = {
-	--	SelectType = "SelectMultiple",
-	--	Values = { "NPSGraphAtTop", "FailNotification", "No Mines" },
-	--	LoadSelections = function(self, list, pn)
-	--		local mods = SL[ToEnumShortString(pn)].ActiveModifiers
-	--		local playeroptions = GAMESTATE:GetPlayerState(pn):GetPlayerOptionsArray("ModsLevel_Preferred")
-	--		local vals = self.Values
-	--
-	--		for i, mod in ipairs(vals) do
-	--			if i == 3 then
-	--				list[i] = false
-	--				for option in ivalues(playeroptions) do
-	--					if option:match("NoMines") then
-	--						list[i] = true
-	--					end
-	--				end
-	--			else
-	--				list[i] = mods[mod] or false
-	--			end
-	--		end
-	--		return list
-	--	end,
-	--	SaveSelections = function(self, list, pn)
-	--		local mods, playeroptions = GetModsAndPlayerOptions(pn)
-	--		local vals = self.Values
-	--		for i, mod in ipairs(vals) do
-	--			if i == 3 then
-	--				playeroptions:NoMines(list[3])
-	--			else
-	--				mods[mod] = list[i]
-	--			end
-	--		end
-	--	end,
-	--},
+	-------------------------------------------------------------------------
+    JudgementTiltMultiplier = {
+        LayoutType = "ShowOneInRow",
+        ExportOnChange = true,
+        Choices = function()
+            local first	= 0.1
+            local last 	= 3
+            local step 	= 0.1
+
+            return range(first, last, step)
+        end,
+        LoadSelections = function(self, list, pn)
+            local val = tonumber(SL[ToEnumShortString(pn)].ActiveModifiers.JudgementTiltMultiplier) or 0
+            for i,v in ipairs(self.Choices) do
+                if v == val then
+                    list[i] = true
+                    break
+                end
+            end
+            return list
+        end,
+        SaveSelections = function(self, list, pn)
+            for i,v in ipairs(self.Choices) do
+                if list[i] then
+                    SL[ToEnumShortString(pn)].ActiveModifiers.JudgementTiltMultiplier = v
+                    break
+                end
+            end
+        end
+    },
 	-------------------------------------------------------------------------
 	SubtractiveScoring = {
 		--Choices = { "Off", "Original", "Full", "Predicted" },
