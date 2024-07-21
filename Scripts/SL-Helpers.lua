@@ -287,19 +287,28 @@ end
 -- used to position various elements in ScreenGameplay
 
 GetNotefieldX = function( player )
+	if not player then return end
+
+	local style = GAMESTATE:GetCurrentStyle()
+	if not style then return end
+
 	local p = ToEnumShortString(player)
 	local game = GAMESTATE:GetCurrentGame():GetName()
 
-	local IsPlayingDanceSolo = (GAMESTATE:GetCurrentStyle():GetStepsType() == "StepsType_Dance_Solo")
-	local NumPlayersEnabled = GAMESTATE:GetNumPlayersEnabled()
-	local NumSidesJoined = GAMESTATE:GetNumSidesJoined()
+	local IsPlayingDanceSolo = (style:GetStepsType() == "StepsType_Dance_Solo")
+	local NumPlayersEnabled  = GAMESTATE:GetNumPlayersEnabled()
+	local NumSidesJoined     = GAMESTATE:GetNumSidesJoined()
 	local IsUsingSoloSingles = PREFSMAN:GetPreference('Center1Player') or IsPlayingDanceSolo or (NumSidesJoined==1 and (game=="techno" or game=="kb7"))
 
+	-- dance solo is always centered
 	if IsUsingSoloSingles and NumPlayersEnabled == 1 and NumSidesJoined == 1 then return _screen.cx end
-	if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then return _screen.cx end
+	-- double is always centered
+	if style:GetStyleType() == "StyleType_OnePlayerTwoSides" then return _screen.cx end
 
-	local NumPlayersAndSides = ToEnumShortString( GAMESTATE:GetCurrentStyle():GetStyleType() )
-	return THEME:GetMetric("ScreenGameplay","Player".. p .. NumPlayersAndSides .."X")
+	local PlayerOffset = SL[p].ActiveModifiers.NoteFieldOffsetX * (player == PLAYER_1 and -1 or 1)
+
+	local NumPlayersAndSides = ToEnumShortString( style:GetStyleType() )
+	return THEME:GetMetric("ScreenGameplay","Player".. p .. NumPlayersAndSides .."X") + PlayerOffset
 end
 
 -- -----------------------------------------------------------------------

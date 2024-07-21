@@ -16,6 +16,8 @@ local profile_whitelist = {
 	EarlyLate = "string",
 	EarlyLateColor = "string",
 	BackgroundFilter = "string",
+	NoteFieldOffsetX = "number",
+	NoteFieldOffsetY = "number",
     VisualDelay = "string",
 
 	HideTargets = "boolean",
@@ -92,8 +94,7 @@ local profile_whitelist = {
 	JudgementsRandomTilt  = "boolean",
 	JudgementsWild = "boolean",
 	
-	CustomMeasureCounter = "string",
-	LookaheadNumber = "number",
+	MeasureCounterLookahead = "number",
 	
 	FailNotification = "boolean",
 	PacemakerText = "string",

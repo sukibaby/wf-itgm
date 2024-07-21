@@ -135,6 +135,11 @@ local af = Def.ActorFrame{
 		Name="JudgmentWithOffsets",
 		InitCommand=function(self)
 			self:animate(false):visible(false)
+
+          	local mini = mods.Mini:gsub("%%","") / 100
+			-- self:addx((GetNotefieldX(pn) * (1 + mini)) * 2)
+			-- self:addy((mods.NoteFieldOffsetY * (1 + mini)) * 2)
+
 			if string.match(tostring(SCREENMAN:GetTopScreen()), "ScreenEdit") then
 				self:Load(THEME:GetPathG("", "_judgments/Optimus Dark"))
 			elseif file_to_load ~= "Plain Text" then

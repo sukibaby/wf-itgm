@@ -592,11 +592,6 @@ local Overrides = {
 			mods.JudgementsWild					= list[6]			
 		end,
 	},
-	CustomMeasureCounter = {
-		Choices = { "None", "Encoder", "Crush", "Oceanlab" },
-		Values = { "None", "Encoder", "Crush", "Oceanlab" }
-	},
-	
 	-------------------------------------------------------------------------
 	TargetScore = {
 		Values = { 'C', 'B', 'A', 'AA', 'AAA', 'S', 'Machine best', 'Personal best' },
@@ -732,9 +727,69 @@ local Overrides = {
 		Values = { "MeasureCounterLeft", "MeasureCounterUp", "NoDescendingZoom" },
 	},
 	-------------------------------------------------------------------------
-	LookaheadNumber = {
+	MeasureCounterLookahead = {
 		-- I couldn't figure out how to save the option so I was lazy and did this lol
 		Values = { 0, 1, 2, 3, 4, 5 },
+	},
+	-------------------------------------------------------------------------
+	NoteFieldOffsetX = {
+		LayoutType = "ShowOneInRow",
+		ExportOnChange = true,
+		Choices = function()
+			local first	= -50
+			local last 	= 50
+			local step 	= 1
+
+			return range(first, last, step)
+		end,
+		LoadSelections = function(self, list, pn)
+			local val = tonumber(SL[ToEnumShortString(pn)].ActiveModifiers.NoteFieldOffsetX) or 0
+			for i,v in ipairs(self.Choices) do
+				if v == val then
+					list[i] = true
+					break
+				end
+			end
+			return list
+		end,
+		SaveSelections = function(self, list, pn)
+			for i,v in ipairs(self.Choices) do
+				if list[i] then
+					SL[ToEnumShortString(pn)].ActiveModifiers.NoteFieldOffsetX = v
+					break
+				end
+			end
+		end
+	},
+	-------------------------------------------------------------------------
+	NoteFieldOffsetY = {
+		LayoutType = "ShowOneInRow",
+		ExportOnChange = true,
+		Choices = function()
+			local first	= -50
+			local last 	= 50
+			local step 	= 1
+
+			return range(first, last, step)
+		end,
+		LoadSelections = function(self, list, pn)
+			local val = tonumber(SL[ToEnumShortString(pn)].ActiveModifiers.NoteFieldOffsetY) or 0
+			for i,v in ipairs(self.Choices) do
+				if v == val then
+					list[i] = true
+					break
+				end
+			end
+			return list
+		end,
+		SaveSelections = function(self, list, pn)
+			for i,v in ipairs(self.Choices) do
+				if list[i] then
+					SL[ToEnumShortString(pn)].ActiveModifiers.NoteFieldOffsetY = v
+					break
+				end
+			end
+		end
 	},
 	-------------------------------------------------------------------------
 	LifeMeterType = {

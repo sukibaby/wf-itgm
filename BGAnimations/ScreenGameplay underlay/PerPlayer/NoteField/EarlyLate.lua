@@ -1,4 +1,4 @@
-local player = ...
+local player, layout = ...
 local pn = tonumber(player:sub(-1))
 local mods = SL["P"..pn].ActiveModifiers -- urgh why is pn not consistent through the whole theme lol
 
@@ -222,7 +222,7 @@ end
 
 local af = Def.ActorFrame{
     InitCommand = function(self)
-        self:xy(GetNotefieldX(player), _screen.cy)
+        self:xy(GetNotefieldX(player), layout.y)
     end,
 	UpdateBGFilterPositionMessageCommand=function(self, params)
 		if params.Player == player then

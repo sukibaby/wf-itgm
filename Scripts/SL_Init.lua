@@ -13,6 +13,8 @@ local PlayerDefaults = {
 				BackgroundFilter = "Off",
 				ScreenDarken = 0,
                 VisualDelay = "0ms",
+				NoteFieldOffsetX = 0,
+				NoteFieldOffsetY = 0,
 
 				HideTargets = false,
 				HideSongBG = false,
@@ -30,6 +32,7 @@ local PlayerDefaults = {
 				MeasureCounter = "None",
 				MeasureCounterLeft = true,
 				MeasureCounterUp = false,
+				MeasureCounterLookahead = 3,
                 MeasureLines = "Off",
 				DataVisualizations = "None",
 				TargetScore = 1,
@@ -89,9 +92,6 @@ local PlayerDefaults = {
 				JudgementsResponsiveInverse = false,
 				JudgementsRandomTilt  = false,
 				JudgementsWild = false,
-				
-				CustomMeasureCounter = "None",
-				LookaheadNumber = 3,
 				
 				FailNotification = false,
 				
