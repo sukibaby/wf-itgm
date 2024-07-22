@@ -34,6 +34,10 @@ local GetPlayableTrails = function(course)
 	return trails
 end
 
+local FloatEquals = function(a, b)
+    return math.abs(a-b) < 0.0001
+end
+
 -- -----------------------------------------------------------------------
 -- when to use Choices() vs. Values()
 --
@@ -650,12 +654,13 @@ local Overrides = {
             local last 	= 3
             local step 	= 0.1
 
-            return range(first, last, step)
+            return stringify(range(first, last, step), "%g")
         end,
         LoadSelections = function(self, list, pn)
-            local val = tonumber(SL[ToEnumShortString(pn)].ActiveModifiers.JudgementTiltMultiplier) or 0
+            local mods = SL[ToEnumShortString(pn)].ActiveModifiers
+            local val = tonumber(mods.JudgementTiltMultiplier)
             for i,v in ipairs(self.Choices) do
-                if v == val then
+                if FloatEquals(v, val) then
                     list[i] = true
                     break
                 end
@@ -663,9 +668,10 @@ local Overrides = {
             return list
         end,
         SaveSelections = function(self, list, pn)
-            for i,v in ipairs(self.Choices) do
+            local mods = SL[ToEnumShortString(pn)].ActiveModifiers
+            for i=1,#self.Choices do
                 if list[i] then
-                    SL[ToEnumShortString(pn)].ActiveModifiers.JudgementTiltMultiplier = v
+                    mods.JudgementTiltMultiplier = tonumber( self.Choices[i] )
                     break
                 end
             end
