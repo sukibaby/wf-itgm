@@ -87,12 +87,8 @@ local profile_whitelist = {
 	NiceSoundCombo = "boolean",
 	NiceSoundJudgements = "boolean",
 	
-	JudgementsTilt = "boolean",
-	JudgementsCumulativeTilt = "boolean",
-	JudgementsResponsive = "boolean",
-	JudgementsResponsiveInverse = "boolean",
-	JudgementsRandomTilt  = "boolean",
-	JudgementsWild = "boolean",
+	JudgementTilt = "boolean",
+    JudgementTiltMultiplier = "number",
 	
 	MeasureCounterLookahead = "number",
 	

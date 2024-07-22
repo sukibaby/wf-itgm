@@ -85,41 +85,12 @@ local af = Def.ActorFrame{
 	JudgementMessageCommand=function(self,params)
 	-- Fun mod stuff
 	local TNO = params.TapNoteOffset and params.TapNoteOffset or 0
-	if mods.JudgementsCumulativeTilt then
-		self:rotationz(self:GetRotationZ()+TNO * 100)
-	end
-	if mods.JudgementsRandomTilt then
-		self:rotationz(math.random(1,360))
-	end
-	if mods.JudgementsTilt and not mods.JudgementsCumulativeTilt then
-		self:rotationz(TNO * 300)
-	end
-	if mods.JudgementsWild then
-		self:rotationz(math.random(1, 360)):zoom(math.random(0.5,3)):x(math.random(-100,100)):y(math.random(-100,100))
+	if mods.JudgementTilt then
+		self:rotationz(TNO * 300 * mods.JudgementTiltMultiplier)
 	end
 end
 }
 
 af[#af+1] = text
-
--- Responsive judgement. Input Handler in BGAnimations\ScreenGameplay overlay\default.lua
-af.ButtonPressMessageCommand = function(self, params)
-		if params.Player == player then
-			if mods.JudgementsResponsive then
-				if params.Button == "Left" then self:stopeffect():addx(-1.5)
-				elseif params.Button == "Right" then self:stopeffect():addx(1.5)
-				elseif params.Button == "Up" then self:stopeffect():addy(-1.5)
-				elseif params.Button == "Down" then self:stopeffect():addy(1.5)
-				end
-			end
-			if mods.JudgementsResponsiveInverse then					
-				if params.Button == "Left" then self:stopeffect():addx(1.5)
-				elseif params.Button == "Right" then self:stopeffect():addx(-1.5)
-				elseif params.Button == "Up" then self:stopeffect():addy(1.5)
-				elseif params.Button == "Down" then self:stopeffect():addy(-1.5)
-				end
-			end
-		end
-	end
 
 return af
