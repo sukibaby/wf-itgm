@@ -570,26 +570,27 @@ local Overrides = {
 	},
 	Judgements = {
 		SelectType = "SelectMultiple",
+		Choices = { "Tilt", "Cumulative Tilt", "Random Tilt", "Responsive", "Inverse Responsive", "Wild" },
 		Values = { "Tilt", "Cumulative Tilt", "Random Tilt", "Responsive", "Inverse Responsive", "Wild" },
 		LoadSelections = function(self, list, pn)
 			local mods = SL[ToEnumShortString(pn)].ActiveModifiers
-			list[1] = mods.JudgementsTilt				or false
-			list[2] = mods.JudgementsCumulativeTilt		or false
-			list[3] = mods.JudgementsRandomTilt			or false
-			list[4] = mods.JudgementsResponsive			or false
-			list[5] = mods.JudgementsResponsiveInverse	or false
-			list[6] = mods.JudgementsWild				or false
+			list[1] = mods.JudgementsTilt                or false
+			list[2] = mods.JudgementsCumulativeTilt      or false
+			list[3] = mods.JudgementsRandomTilt          or false
+			list[4] = mods.JudgementsResponsive          or false
+			list[5] = mods.JudgementsResponsiveInverse   or false
+			list[6] = mods.JudgementsWild                or false
 
 			return list
 		end,
 		SaveSelections = function(self, list, pn)
 			local mods, playeroptions = GetModsAndPlayerOptions(pn)
-			mods.JudgementsTilt					= list[1]
-			mods.JudgementsCumulativeTilt		= list[2]
-			mods.JudgementsRandomTilt			= list[3]
-			mods.JudgementsResponsive			= list[4]
-			mods.JudgementsResponsiveInverse	= list[5]			
-			mods.JudgementsWild					= list[6]			
+			mods.JudgementsTilt                 = list[1]
+			mods.JudgementsCumulativeTilt       = list[2]
+			mods.JudgementsRandomTilt           = list[3]
+			mods.JudgementsResponsive           = list[4]
+			mods.JudgementsResponsiveInverse    = list[5]           
+			mods.JudgementsWild                 = list[6]           
 		end,
 	},
 	-------------------------------------------------------------------------
