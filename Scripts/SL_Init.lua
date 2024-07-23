@@ -6,14 +6,7 @@ local PlayerDefaults = {
 			self.ActiveModifiers = {
 				SpeedModType = "X",
 				SpeedMod = 1.00,
-				
-				-- I want Love 2x7 to be the default ITG mode judgement font.
-				-- there is no "Swiss" for ITG mode included with the theme,
-				-- so when it fails to find a Swiss for ITG, it will fall back
-				-- to Love 2x7 (doubleres). This is abusing fallback behavior,
-				-- but it provides the result I want, so I'm sticking with it.
-				JudgmentGraphic = "Swiss 2x7 (doubleres).png",
-				
+				JudgmentGraphic = "Optimus Dark 1x7 (doubleres).png",
 				EarlyLate = "Enabled",
 				NoteSkin = nil,
 				Mini = "0%",
