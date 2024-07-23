@@ -3,6 +3,8 @@
 ### _Based on Waterfall Expanded 0.7.8 - theme originally by SteveReen_
 ### 
 
+Please note this theme is in a pre-release state currently. We are working on it and will announce a release once it's ready. Please feel free to use it as-is until then. See the commit history for more details.
+
 ### This features general updates, bug fixes, performance improvements, an updated emoji set, and support for ITGmania specific features (visual delay, engine recalcs, etc)
 
 ![2024-07-21_201557](https://github.com/user-attachments/assets/1e2d774a-17d6-427a-8e93-3684da327f68)
