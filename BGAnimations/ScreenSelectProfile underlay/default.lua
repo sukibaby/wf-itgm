@@ -61,10 +61,16 @@ local invalid_count = 0
 
 local t = Def.ActorFrame {
 
-	InitCommand=function(self) self:queuecommand("Initialize") end,
-	InitializeCommand=function(self)
-		-- Initialize input callback and check menu timer without delay
-		self:queuecommand("InitInput")
+	InitCommand=function(self) self:queuecommand("Stall") end,
+	StallCommand=function(self)
+		-- FIXME: Stall for 0.5 seconds so that the Lua InputCallback doesn't get immediately added to the screen.
+		-- It's otherwise possible to enter the screen with MenuLeft/MenuRight already held and firing off events,
+		-- which causes the sick_wheel of profile names to not display.  I don't have time to debug it right now.
+		self:sleep(0.5):queuecommand("InitInput")
+
+		-- FIXME: I need to find time to look at how the engine actually handles MenuTimers because
+		-- including an Actor command that queues itself every 0.5 seconds to check the MenuTimer on custom
+		-- screens like this (and ScreenPlayAgain, etc.) seems like it should be unnecessary.)
 		if PREFSMAN:GetPreference("MenuTimer") then
 			self:queuecommand("CheckMenuTimer")
 		end
@@ -100,17 +106,10 @@ local t = Def.ActorFrame {
 	end,
 
 	-- the OffCommand will have been queued, when it is appropriate, from ./Input.lua
-	-- use a flag to check if the PlayerFrames have finished their tweening
+	-- sleep for 0.5 seconds to give the PlayerFrames time to tween out
+	-- and queue a call to Finish() so that the engine can wrap things up
 	OffCommand=function(self)
-		self:queuecommand("CheckTween")
-	end,
-	CheckTweenCommand=function(self)
-		-- Check if the PlayerFrames have finished their tweening
-		if self:GetChild("PlayerFrame1"):GetTweenTimeLeft() == 0 and self:GetChild("PlayerFrame2"):GetTweenTimeLeft() == 0 then
-			self:queuecommand("Finish")
-		else
-			self:sleep(0.1):queuecommand("CheckTween")
-		end
+		self:sleep(0.5):queuecommand("Finish")
 	end,
 	FinishCommand=function(self)
 		-- If either/both human players want to *not* use a local profile
