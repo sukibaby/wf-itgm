@@ -216,6 +216,40 @@ local af = Def.ActorFrame{
 		end
 	},
 
+    -- Peak NPS/eBPM
+    Def.ActorFrame{
+        LoadFont("Common Normal")..{
+            Name = "NPS",
+            Text = "",
+            InitCommand = function(self)
+                self:zoom(0.7)
+                self:settext("Peak NPS: \nPeak eBPM: ")
+                self:horizalign(left)
+                self:y(-5)
+                self:x(250)
+                self:visible(true)
+            end,
+            HideCommand = function(self)
+                self:settext("Peak NPS: \nPeak eBPM: ")
+                self:visible(false)
+            end,
+            PeakNPSUpdatedMessageCommand = function(self)
+                if SL[pn].Streams.PeakNPS ~= nil then
+                    local nps = SL[pn].Streams.PeakNPS * SL.Global.ActiveModifiers.MusicRate
+                    self:horizalign("left")
+                    self:y(-5)
+                    self:x(250)
+                    self:settext(("Peak NPS: %.1f\nPeak eBPM: %.0f"):format(nps, nps * 15))
+                    self:visible(true)
+                end
+            end,
+            OffCommand = function(self)
+                leaving_screen = true
+                self:stoptweening()
+            end,
+        }
+    },
+
 	-- conditional quad with breakdown at the bottom of density graph
 	-- put it underneath for single player, but bump it up in multiplayer
 	Def.ActorFrame{

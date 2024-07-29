@@ -12,7 +12,7 @@ local PlayerDefaults = {
 				Mini = "0%",
 				BackgroundFilter = "Off",
 				ScreenDarken = 0,
-                VisualDelay = "0ms",
+				VisualDelay = "0ms",
 				NoteFieldOffsetX = 0,
 				NoteFieldOffsetY = 0,
 
@@ -22,7 +22,7 @@ local PlayerDefaults = {
 				HideLifebar = false,
 				HideScore = false,
 				HideDanger = false,
-				
+
 				ColumnFlashOnMiss = false,
 				SubtractiveScoring = "string",
 				PacemakerText = "string",
@@ -33,23 +33,23 @@ local PlayerDefaults = {
 				MeasureCounterLeft = true,
 				MeasureCounterUp = false,
 				MeasureCounterLookahead = 3,
-                MeasureLines = "Off",
+				MeasureLines = "Off",
 				DataVisualizations = "None",
 				TargetScore = 1,
 				ActionOnMissedTarget = "Nothing",
 				LifeMeterType = "Standard",
 				--MissBecauseHeld = false,
-				NPSGraphAtTop = false,	
+				NPSGraphAtTop = false,
 				EXScoring = false,
 				ColumnCues = false,
-                ColumnCountdown = false,
+				ColumnCountdown = false,
 				OffsetDisplay = false,
 
 				-- New step stats stuff
 				StepInfo = false,
 				Groovestats = false,
-				TimeElapsed = false,	
-				
+				TimeElapsed = false,
+
 				-- waterfall/bistro options
 				SimulateITGEnv = false,
 				PreferredLifeBar = "Hard",
@@ -64,14 +64,14 @@ local PlayerDefaults = {
 				PreferredGameEnv = "Waterfall",
 				PreferredFaultWindow = 1,
 				GSOverride = false,
-				
+
 				-- Fun stuff
-				
+
 				GIF = "None",
 				GIFResponsive = false,
 				GIFDVD = false,
 				GIFRandom = false,
-			
+
 				ComboEffectsWild = false,
 				ComboEffectsNice = false,
 
@@ -79,24 +79,25 @@ local PlayerDefaults = {
 				ComboStretchHorizontal = false,
 				ComboStretchVertical = false,
 				ComboStretchRandom 	 = false,
-				
+
 				ComboRotation = "None",
 				ComboRainbow = "None",
-				
+
 				NiceSoundCombo = false,
 				NiceSoundJudgements = false,
-				
+
 				JudgementTilt = false,
-                JudgementTiltMultiplier = 1.0,
-				
+				JudgementTiltMultiplier = 1.0,
+
 				FailNotification = false,
-				
+
 			}
 			self.Streams = {
 				SongDir = nil,
 				StepsType = nil,
 				Difficulty = nil,
 				Measures = nil,
+				PeakNPS = 0,
 			}
 			self.HighScores = {
 				EnteringName = false,
