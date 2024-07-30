@@ -618,7 +618,7 @@ local Overrides = {
 			local vals = self.Values
 
 			for i, mod in ipairs(vals) do
-				if i == 3 then
+				if i == 4 then
 					--list[i] = false
 					for option in ivalues(playeroptions) do
 						if option:match("NoMines") then
@@ -635,8 +635,8 @@ local Overrides = {
 			local mods, playeroptions = GetModsAndPlayerOptions(pn)
 			local vals = self.Values
 			for i, mod in ipairs(vals) do
-				if i == 3 then
-					playeroptions:NoMines(list[3])
+				if i == 4 then
+					playeroptions:NoMines(list[4])
 					local p = ToEnumShortString(pn)
 					SL[p].PlayerOptionsString = GAMESTATE:GetPlayerState(pn):GetPlayerOptionsString("ModsLevel_Preferred")
 				else
