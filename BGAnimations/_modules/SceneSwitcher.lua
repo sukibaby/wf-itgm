@@ -5,7 +5,7 @@ local t = Def.ActorFrame {}
 -- Scene Switcher Text File
 t[#t+1] = Def.ActorFrame {
     InitCommand=function(self)
-		filepath = "Logs/SMScene.txt"
+		filepath = "Save/SMScene.txt"
 		f = RageFileUtil.CreateRageFile()
 		f:Open(filepath, 2)
 		f:Write(screen) 
@@ -28,7 +28,7 @@ t[#t+1] = Def.ActorFrame {
 			else gamemode = "p2"
 			end
 		end
-		filepath = "Logs/GameMode.txt"
+		filepath = "Save/GameMode.txt"
 		f = RageFileUtil.CreateRageFile()
 		f:Open(filepath, 2)
 		f:Write(gamemode) 
