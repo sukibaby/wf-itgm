@@ -46,10 +46,15 @@ else
         end,
         SetGradeCommand = function(self, param)
             local frame = 6
+            if (not param) or (type(param == "number") and param[1] > 90) then
+                self:visible(false)
+                return
+            else
                 local grade = param[1]
                 frame = grade - 1
-            self:setstate(frame):visible(true)
-            Trace("Grade set "..frame)
+                Trace("Grade set "..frame)
+                self:setstate(frame):visible(true)
+            end
         end
     }
     return af

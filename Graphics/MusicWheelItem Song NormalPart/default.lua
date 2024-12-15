@@ -118,10 +118,9 @@ for player in ivalues(players) do
 		                  local grade = WF.Grades[CalculateGrade(stats.BestPercentDP)]
 		                  -- local grade = CalculateGrade(stats.BestPercentDP)
 					if ct ~= WF.ClearTypes.None then
+                        self:settext("")
 						self:diffuse(WF.ClearTypeColor(ct))
-						if tonumber(stats.RateMod) == SL.Global.ActiveModifiers.MusicRate then
-		                          -- self:playcommand("SetGrade", {grade})
-						else
+						if not tonumber(stats.RateMod) == SL.Global.ActiveModifiers.MusicRate then
                             self:visible(true)
 							self:settext(shortrate or stats.RateMod)
 						end
@@ -137,7 +136,7 @@ for player in ivalues(players) do
 			end
 		}
 		gradeframe[#gradeframe+1] = LoadActor(THEME:GetPathG("","_GradesSmall/WheelLetterGrade.lua"), {})..{
-			Name = "CTText",
+			Name = "CTGrade",
 			Text = "",
 			OnCommand = function(self)
 				self:zoom(WideScale(0.18, 0.25))
